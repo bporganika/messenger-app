@@ -1,44 +1,116 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, StyleSheet, Pressable } from 'react-native';
+import Animated, { FadeInUp } from 'react-native-reanimated';
+import Svg, { Path } from 'react-native-svg';
 import { useTheme } from '../../design-system';
 import { spacing, radius } from '../../design-system/tokens';
+import { haptics } from '../../design-system/haptics';
 import { Text, Divider } from '../../components/ui';
+
+type Visibility = 'everyone' | 'contacts' | 'nobody';
+
+const VISIBILITY_LABELS: Record<Visibility, string> = {
+  everyone: 'Everyone',
+  contacts: 'Contacts only',
+  nobody: 'Nobody',
+};
+
+const CYCLE: Visibility[] = ['everyone', 'contacts', 'nobody'];
+
+function nextVisibility(current: Visibility): Visibility {
+  const idx = CYCLE.indexOf(current);
+  return CYCLE[(idx + 1) % CYCLE.length];
+}
 
 export function PrivacyScreen() {
   const { colors } = useTheme();
+  const [phone, setPhone] = useState<Visibility>('contacts');
+  const [lastSeen, setLastSeen] = useState<Visibility>('everyone');
+  const [avatar, setAvatar] = useState<Visibility>('everyone');
 
-  const items = [
-    { label: 'Phone number', value: 'Contacts only' },
-    { label: 'Last seen', value: 'Everyone' },
-    { label: 'Profile photo', value: 'Everyone' },
-  ];
+  const cycle = useCallback(
+    (setter: (v: Visibility) => void, current: Visibility) => {
+      haptics.buttonPress();
+      setter(nextVisibility(current));
+      // TODO: PATCH /api/v1/users/me/privacy
+    },
+    [],
+  );
 
   return (
     <View style={[styles.container, { backgroundColor: colors.bgPrimary }]}>
-      <View
-        style={[
-          styles.section,
-          { backgroundColor: colors.surfaceDefault, borderColor: colors.borderDefault },
-        ]}>
-        {items.map((item, i) => (
-          <React.Fragment key={item.label}>
-            {i > 0 && <Divider inset={16} />}
-            <View style={styles.row}>
-              <Text variant="body" style={styles.label}>{item.label}</Text>
-              <Text variant="bodySm" color={colors.textSecondary}>{item.value}</Text>
-            </View>
-          </React.Fragment>
-        ))}
-      </View>
-      <Text variant="caption" color={colors.textTertiary} style={styles.hint}>
-        Control who can see your personal information
-      </Text>
+      <Animated.View entering={FadeInUp.springify()}>
+        <Text variant="caption" color={colors.textTertiary} style={styles.sectionLabel}>
+          WHO CAN SEE MY
+        </Text>
+        <View style={[styles.section, { backgroundColor: colors.surfaceDefault, borderColor: colors.borderDefault }]}>
+          <PrivacyRow
+            icon={<Svg width={20} height={20} viewBox="0 0 24 24" fill="none"><Path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" stroke={colors.textSecondary} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" /></Svg>}
+            label="Phone number"
+            value={VISIBILITY_LABELS[phone]}
+            onPress={() => cycle(setPhone, phone)}
+          />
+          <Divider inset={52} />
+          <PrivacyRow
+            icon={<Svg width={20} height={20} viewBox="0 0 24 24" fill="none"><Path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" stroke={colors.textSecondary} strokeWidth={1.5} /><Path d="M12 6v6l4 2" stroke={colors.textSecondary} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" /></Svg>}
+            label="Last seen"
+            value={VISIBILITY_LABELS[lastSeen]}
+            onPress={() => cycle(setLastSeen, lastSeen)}
+          />
+          <Divider inset={52} />
+          <PrivacyRow
+            icon={<Svg width={20} height={20} viewBox="0 0 24 24" fill="none"><Path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" stroke={colors.textSecondary} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" /><Path d="M12 3a4 4 0 100 8 4 4 0 000-8z" stroke={colors.textSecondary} strokeWidth={1.5} /></Svg>}
+            label="Profile photo"
+            value={VISIBILITY_LABELS[avatar]}
+            onPress={() => cycle(setAvatar, avatar)}
+          />
+        </View>
+      </Animated.View>
+
+      <Animated.View entering={FadeInUp.springify().delay(100)}>
+        <Text variant="caption" color={colors.textTertiary} style={styles.hint}>
+          Tap each row to cycle through visibility options.{'\n'}
+          Changes are saved automatically.
+        </Text>
+      </Animated.View>
     </View>
   );
 }
 
+function PrivacyRow({
+  icon,
+  label,
+  value,
+  onPress,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  value: string;
+  onPress: () => void;
+}) {
+  const { colors } = useTheme();
+  return (
+    <Pressable onPress={onPress} style={styles.row}>
+      <View style={styles.rowIcon}>{icon}</View>
+      <Text variant="body" style={styles.rowLabel}>{label}</Text>
+      <Text variant="bodySm" color={colors.accentPrimary}>
+        {value}
+      </Text>
+      <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" style={styles.chevron}>
+        <Path d="M9 18l6-6-6-6" stroke={colors.textTertiary} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+      </Svg>
+    </Pressable>
+  );
+}
+
 const styles = StyleSheet.create({
-  container: { flex: 1, paddingTop: spacing['16'] },
+  container: { flex: 1, paddingTop: spacing['8'] },
+  sectionLabel: {
+    marginHorizontal: spacing['24'],
+    marginTop: spacing['16'],
+    marginBottom: spacing['8'],
+    letterSpacing: 0.8,
+  },
   section: {
     marginHorizontal: spacing['16'],
     borderRadius: radius.lg,
@@ -51,9 +123,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing['16'],
     paddingVertical: spacing['12'],
   },
-  label: { flex: 1 },
+  rowIcon: {
+    width: 28,
+    alignItems: 'center',
+    marginRight: spacing['12'],
+  },
+  rowLabel: { flex: 1 },
+  chevron: { marginLeft: spacing['4'] },
   hint: {
     marginHorizontal: spacing['24'],
-    marginTop: spacing['12'],
+    marginTop: spacing['16'],
+    lineHeight: 20,
   },
 });

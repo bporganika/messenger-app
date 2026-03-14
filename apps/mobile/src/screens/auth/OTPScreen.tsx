@@ -1,12 +1,20 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { View, StyleSheet, TextInput, Pressable } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  TextInput,
+  Pressable,
+  Platform,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSequence,
   withTiming,
+  withRepeat,
   FadeInUp,
+  interpolateColor,
 } from 'react-native-reanimated';
 import Svg, { Path } from 'react-native-svg';
 import { useTheme } from '../../design-system';
@@ -18,27 +26,116 @@ import { Text } from '../../components/ui';
 import type { AuthScreenProps } from '../../navigation/types';
 
 const CODE_LENGTH = 6;
+const SHAKE_OFFSET = 10;
+const SHAKE_DURATION = 50;
 
+// ─── Animated digit box ─────────────────────────────────
+function DigitBox({
+  digit,
+  isFocused,
+  isError,
+}: {
+  digit: string;
+  isFocused: boolean;
+  isError: boolean;
+}) {
+  const { colors } = useTheme();
+
+  // Blinking cursor
+  const cursorOpacity = useSharedValue(1);
+  useEffect(() => {
+    if (isFocused && !digit) {
+      cursorOpacity.value = withRepeat(
+        withSequence(
+          withTiming(1, { duration: 400 }),
+          withTiming(0, { duration: 400 }),
+        ),
+        -1,
+        true,
+      );
+    } else {
+      cursorOpacity.value = withTiming(0, { duration: 100 });
+    }
+  }, [isFocused, digit, cursorOpacity]);
+
+  const cursorStyle = useAnimatedStyle(() => ({
+    opacity: cursorOpacity.value,
+  }));
+
+  // Border color interpolation
+  const borderProgress = useSharedValue(0);
+  useEffect(() => {
+    if (isError) {
+      borderProgress.value = withTiming(2, { duration: 150 });
+    } else if (digit || isFocused) {
+      borderProgress.value = withTiming(1, { duration: 150 });
+    } else {
+      borderProgress.value = withTiming(0, { duration: 150 });
+    }
+  }, [isError, digit, isFocused, borderProgress]);
+
+  const boxStyle = useAnimatedStyle(() => ({
+    borderColor: interpolateColor(
+      borderProgress.value,
+      [0, 1, 2],
+      [colors.borderDefault, colors.accentPrimary, colors.accentError],
+    ),
+  }));
+
+  return (
+    <Animated.View
+      style={[
+        styles.digitBox,
+        { backgroundColor: colors.surfaceDefault },
+        boxStyle,
+      ]}>
+      {digit ? (
+        <Animated.Text
+          style={[
+            styles.digitText,
+            {
+              color: colors.textPrimary,
+              fontFamily: fontFamily.bold,
+              fontSize: typography.heading.fontSize,
+            },
+          ]}>
+          {digit}
+        </Animated.Text>
+      ) : (
+        <Animated.View
+          style={[
+            styles.cursor,
+            { backgroundColor: colors.accentPrimary },
+            cursorStyle,
+          ]}
+        />
+      )}
+    </Animated.View>
+  );
+}
+
+// ─── Screen ─────────────────────────────────────────────
 export function OTPScreen({ navigation, route }: AuthScreenProps<'OTP'>) {
   const { target } = route.params;
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
 
-  const [code, setCode] = useState<string[]>(Array(CODE_LENGTH).fill(''));
+  const [code, setCode] = useState('');
   const [error, setError] = useState(false);
   const [resendTimer, setResendTimer] = useState(45);
   const [loading, setLoading] = useState(false);
+  const [focusedIndex, setFocusedIndex] = useState(0);
 
-  const refs = useRef<(TextInput | null)[]>([]);
+  const inputRef = useRef<TextInput>(null);
   const shakeX = useSharedValue(0);
 
   const shakeStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: shakeX.value }],
   }));
 
-  // Auto-focus first input
+  // Auto-focus hidden input
   useEffect(() => {
-    const timeout = setTimeout(() => refs.current[0]?.focus(), 400);
+    const timeout = setTimeout(() => inputRef.current?.focus(), 400);
     return () => clearTimeout(timeout);
   }, []);
 
@@ -51,80 +148,82 @@ export function OTPScreen({ navigation, route }: AuthScreenProps<'OTP'>) {
     return () => clearInterval(interval);
   }, [resendTimer]);
 
-  const handleDigit = useCallback(
-    (index: number, value: string) => {
-      if (!/^\d*$/.test(value)) return;
-
-      setError(false);
-      const newCode = [...code];
-      newCode[index] = value.slice(-1);
-      setCode(newCode);
-
-      if (value && index < CODE_LENGTH - 1) {
-        refs.current[index + 1]?.focus();
-      }
-
-      // Auto-submit
-      const full = newCode.join('');
-      if (full.length === CODE_LENGTH && !newCode.includes('')) {
-        handleSubmit(full);
-      }
-    },
-    [code],
-  );
-
-  const handleKeyPress = useCallback(
-    (index: number, key: string) => {
-      if (key === 'Backspace' && !code[index] && index > 0) {
-        refs.current[index - 1]?.focus();
-        const newCode = [...code];
-        newCode[index - 1] = '';
-        setCode(newCode);
-      }
-    },
-    [code],
-  );
-
-  const handleSubmit = async (fullCode: string) => {
-    setLoading(true);
-    // TODO: call POST /auth/otp/verify
-    // Simulate verification: navigate to ProfileSetup for demo
-    setTimeout(() => {
-      setLoading(false);
-      // In real flow: if isNewUser → ProfileSetup, else → setAuth
-      navigation.navigate('ProfileSetup', {
-        target,
-        tempToken: 'demo-temp-token',
-      });
-    }, 800);
-  };
-
-  const handleResend = () => {
-    if (resendTimer > 0) return;
-    haptics.buttonPress();
-    setResendTimer(45);
-    setCode(Array(CODE_LENGTH).fill(''));
-    refs.current[0]?.focus();
-    // TODO: call POST /auth/otp/send again
-  };
-
-  const triggerShake = () => {
+  const triggerShake = useCallback(() => {
     haptics.error();
     setError(true);
     shakeX.value = withSequence(
-      withTiming(-10, { duration: 50 }),
-      withTiming(10, { duration: 50 }),
-      withTiming(-8, { duration: 50 }),
-      withTiming(8, { duration: 50 }),
-      withTiming(0, { duration: 50 }),
+      withTiming(-SHAKE_OFFSET, { duration: SHAKE_DURATION }),
+      withTiming(SHAKE_OFFSET, { duration: SHAKE_DURATION }),
+      withTiming(-SHAKE_OFFSET * 0.8, { duration: SHAKE_DURATION }),
+      withTiming(SHAKE_OFFSET * 0.8, { duration: SHAKE_DURATION }),
+      withTiming(-SHAKE_OFFSET * 0.4, { duration: SHAKE_DURATION }),
+      withTiming(0, { duration: SHAKE_DURATION }),
     );
-  };
+  }, [shakeX]);
+
+  const handleSubmit = useCallback(
+    (fullCode: string) => {
+      if (loading) return;
+      setLoading(true);
+
+      // TODO: call POST /auth/otp/verify { target, code: fullCode }
+      // Simulate: wrong code → shake, correct → navigate
+      setTimeout(() => {
+        setLoading(false);
+        const isCorrect = true; // Replace with real API response
+
+        if (!isCorrect) {
+          triggerShake();
+          setCode('');
+          inputRef.current?.focus();
+          return;
+        }
+
+        // In real flow: if isNewUser → ProfileSetup, else → setAuth
+        navigation.navigate('ProfileSetup', {
+          target,
+          tempToken: 'demo-temp-token',
+        });
+      }, 800);
+    },
+    [loading, target, navigation, triggerShake],
+  );
+
+  const handleChangeText = useCallback(
+    (text: string) => {
+      // Only digits
+      const digits = text.replace(/\D/g, '').slice(0, CODE_LENGTH);
+      setError(false);
+      setCode(digits);
+      setFocusedIndex(Math.min(digits.length, CODE_LENGTH - 1));
+
+      // Auto-submit when all 6 digits entered
+      if (digits.length === CODE_LENGTH) {
+        handleSubmit(digits);
+      }
+    },
+    [handleSubmit],
+  );
+
+  const handleResend = useCallback(() => {
+    if (resendTimer > 0) return;
+    haptics.buttonPress();
+    setResendTimer(45);
+    setCode('');
+    setError(false);
+    setFocusedIndex(0);
+    inputRef.current?.focus();
+    // TODO: call POST /auth/otp/send again
+  }, [resendTimer]);
 
   const formatTimer = (s: number) => {
     const mins = Math.floor(s / 60);
     const secs = s % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
+
+  // Split code string into individual digits for display
+  const digits = code.split('');
 
   return (
     <View
@@ -165,51 +264,38 @@ export function OTPScreen({ navigation, route }: AuthScreenProps<'OTP'>) {
         </Text>
       </Animated.View>
 
-      {/* OTP boxes */}
-      <Animated.View
-        entering={FadeInUp.delay(200).springify()}
-        style={styles.codeRow}>
-        <Animated.View style={[styles.codeRow, shakeStyle]}>
-          {Array.from({ length: CODE_LENGTH }).map((_, i) => (
-            <View
-              key={i}
-              style={[
-                styles.digitBox,
-                {
-                  backgroundColor: colors.surfaceDefault,
-                  borderColor: error
-                    ? colors.accentError
-                    : code[i]
-                      ? colors.accentPrimary
-                      : colors.borderDefault,
-                },
-              ]}>
-              <TextInput
-                ref={(el) => {
-                  refs.current[i] = el;
-                }}
-                value={code[i]}
-                onChangeText={(v) => handleDigit(i, v)}
-                onKeyPress={({ nativeEvent }) =>
-                  handleKeyPress(i, nativeEvent.key)
-                }
-                keyboardType="number-pad"
-                textContentType={i === 0 ? 'oneTimeCode' : 'none'}
-                maxLength={1}
-                selectTextOnFocus
-                style={[
-                  styles.digitInput,
-                  {
-                    color: colors.textPrimary,
-                    fontFamily: fontFamily.bold,
-                    fontSize: typography.heading.fontSize,
-                  },
-                ]}
+      {/* OTP digit boxes — visual only, tapping focuses hidden input */}
+      <Animated.View entering={FadeInUp.delay(200).springify()}>
+        <Pressable
+          onPress={() => inputRef.current?.focus()}
+          style={styles.codeRow}>
+          <Animated.View style={[styles.codeRow, shakeStyle]}>
+            {Array.from({ length: CODE_LENGTH }).map((_, i) => (
+              <DigitBox
+                key={i}
+                digit={digits[i] ?? ''}
+                isFocused={!error && focusedIndex === i && code.length < CODE_LENGTH}
+                isError={error}
               />
-            </View>
-          ))}
-        </Animated.View>
+            ))}
+          </Animated.View>
+        </Pressable>
       </Animated.View>
+
+      {/* Hidden TextInput — captures all keyboard input + SMS auto-fill */}
+      <TextInput
+        ref={inputRef}
+        value={code}
+        onChangeText={handleChangeText}
+        onFocus={() => setFocusedIndex(Math.min(code.length, CODE_LENGTH - 1))}
+        keyboardType="number-pad"
+        textContentType="oneTimeCode"
+        autoComplete={Platform.OS === 'android' ? 'sms-otp' : undefined}
+        maxLength={CODE_LENGTH}
+        caretHidden
+        autoFocus={false}
+        style={styles.hiddenInput}
+      />
 
       {/* Resend */}
       <Animated.View
@@ -231,6 +317,7 @@ export function OTPScreen({ navigation, route }: AuthScreenProps<'OTP'>) {
   );
 }
 
+// ─── Styles ─────────────────────────────────────────────
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -262,12 +349,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  digitInput: {
+  digitText: {
     textAlign: 'center',
-    width: '100%',
-    height: '100%',
-    padding: 0,
     includeFontPadding: false,
+  },
+  cursor: {
+    width: 2,
+    height: 24,
+    borderRadius: 1,
+  },
+  hiddenInput: {
+    position: 'absolute',
+    opacity: 0,
+    height: 1,
+    width: 1,
   },
   resendWrap: {
     alignItems: 'center',

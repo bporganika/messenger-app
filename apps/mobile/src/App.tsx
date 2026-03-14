@@ -1,12 +1,58 @@
-import React from 'react';
-import { StatusBar } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { AppState, StatusBar } from 'react-native';
+import type { AppStateStatus } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ThemeProvider, useTheme } from './design-system';
 import { RootNavigator } from './navigation/RootNavigator';
+import { LockScreen } from './screens/lock/LockScreen';
+import { useAppLockStore } from './stores/appLockStore';
+import * as CallKeepService from './services/callkeep';
+
+function AppLockGuard() {
+  const isLocked = useAppLockStore((s) => s.isLocked);
+  const pinEnabled = useAppLockStore((s) => s.pinEnabled);
+  const biometricEnabled = useAppLockStore((s) => s.biometricEnabled);
+  const lock = useAppLockStore((s) => s.lock);
+
+  const appStateRef = useRef<AppStateStatus>(AppState.currentState);
+
+  const appLockEnabled = pinEnabled || biometricEnabled;
+
+  // Lock on first mount if enabled
+  useEffect(() => {
+    if (appLockEnabled) {
+      lock();
+    }
+  }, [appLockEnabled, lock]);
+
+  // Lock when returning from background
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (next) => {
+      if (
+        appStateRef.current.match(/inactive|background/) &&
+        next === 'active' &&
+        appLockEnabled
+      ) {
+        lock();
+      }
+      appStateRef.current = next;
+    });
+    return () => sub.remove();
+  }, [appLockEnabled, lock]);
+
+  if (!isLocked || !appLockEnabled) return null;
+
+  return <LockScreen />;
+}
 
 function AppContent() {
   const { isDark } = useTheme();
+
+  useEffect(() => {
+    CallKeepService.setup();
+  }, []);
 
   return (
     <NavigationContainer>
@@ -16,16 +62,19 @@ function AppContent() {
         backgroundColor="transparent"
       />
       <RootNavigator />
+      <AppLockGuard />
     </NavigationContainer>
   );
 }
 
 export default function App() {
   return (
-    <SafeAreaProvider>
-      <ThemeProvider>
-        <AppContent />
-      </ThemeProvider>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <AppContent />
+        </ThemeProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
