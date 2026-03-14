@@ -1,6 +1,8 @@
 import { Server as HttpServer } from 'http';
 import { Server, Socket } from 'socket.io';
+import jwt from 'jsonwebtoken';
 import { prisma } from '../utils/prisma';
+import { config } from '../config';
 import { messageHandler } from './handlers/message.handler';
 import { typingHandler } from './handlers/typing.handler';
 import { presenceHandler } from './handlers/presence.handler';
@@ -18,14 +20,23 @@ export function setupWebSocket(httpServer: HttpServer) {
     cors: { origin: '*', methods: ['GET', 'POST'] },
   });
 
-  // Auth middleware — expect token in handshake
+  // Auth middleware — verify JWT from handshake
   io.use((socket, next) => {
-    const userId = socket.handshake.auth['userId'] as string | undefined;
-    if (!userId) {
+    const token = socket.handshake.auth['token'] as string | undefined;
+    if (!token) {
       return next(new Error('Authentication required'));
     }
-    socket.data['userId'] = userId;
-    next();
+
+    try {
+      const decoded = jwt.verify(token, config.jwt.secret) as { userId: string };
+      if (!decoded.userId) {
+        return next(new Error('Invalid token'));
+      }
+      socket.data['userId'] = decoded.userId;
+      next();
+    } catch {
+      return next(new Error('Invalid or expired token'));
+    }
   });
 
   io.on('connection', async (socket: Socket) => {

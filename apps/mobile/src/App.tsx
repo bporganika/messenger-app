@@ -1,32 +1,31 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { StatusBar } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ThemeProvider, useTheme } from './design-system';
+import { RootNavigator } from './navigation/RootNavigator';
 
-function HomeScreen() {
-  const { colors } = useTheme();
+function AppContent() {
+  const { isDark } = useTheme();
+
   return (
-    <View style={[styles.container, { backgroundColor: colors.bgPrimary }]}>
-      <Text style={[styles.title, { color: colors.textPrimary }]}>Pulse</Text>
-    </View>
+    <NavigationContainer>
+      <StatusBar
+        barStyle={isDark ? 'light-content' : 'dark-content'}
+        translucent
+        backgroundColor="transparent"
+      />
+      <RootNavigator />
+    </NavigationContainer>
   );
 }
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <HomeScreen />
-    </ThemeProvider>
+    <SafeAreaProvider>
+      <ThemeProvider>
+        <AppContent />
+      </ThemeProvider>
+    </SafeAreaProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 32,
-    fontFamily: 'PlusJakartaSans-Bold',
-  },
-});
