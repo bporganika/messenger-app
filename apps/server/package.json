@@ -13,12 +13,22 @@
     "db:push": "prisma db push"
   },
   "dependencies": {
-    "@pulse/shared": "*",
-    "fastify": "^5.0.0",
     "@fastify/cors": "^10.0.0",
-    "@prisma/client": "^6.0.0"
+    "@fastify/jwt": "^10.0.0",
+    "@fastify/multipart": "^9.4.0",
+    "@fastify/rate-limit": "^10.3.0",
+    "@prisma/client": "^6.0.0",
+    "@pulse/shared": "*",
+    "dotenv": "^17.3.1",
+    "fastify": "^5.0.0",
+    "google-auth-library": "^10.6.1",
+    "jsonwebtoken": "^9.0.3",
+    "jwks-rsa": "^4.0.1",
+    "socket.io": "^4.8.3",
+    "twilio": "^5.13.0"
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.10",
     "prisma": "^6.0.0",
     "tsx": "^4.19.0",
     "typescript": "^5.6.0"

@@ -1,0 +1,299 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ===== USERS =====
+
+model User {
+  id           String   @id @default(cuid())
+  phone        String?  @unique
+  email        String?  @unique
+  passwordHash String?
+  googleId     String?  @unique
+  appleId      String?  @unique
+
+  firstName String
+  lastName  String
+  username  String  @unique
+  gender    Gender
+  avatarUrl String?
+  bio       String?
+
+  phoneVisible    PhoneVisibility @default(CONTACTS_ONLY)
+  lastSeenVisible Visibility      @default(EVERYONE)
+  avatarVisible   Visibility      @default(EVERYONE)
+
+  lastSeen  DateTime @default(now())
+  isOnline  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  pinHash          String?
+  biometricEnabled Boolean @default(false)
+
+  language String @default("en")
+
+  sessions            Session[]
+  conversationMembers ConversationMember[]
+  sentMessages        Message[]   @relation("SentMessages")
+  callerCalls         Call[]      @relation("CallerCalls")
+  calleeCalls         Call[]      @relation("CalleeCalls")
+  pushTokens          PushToken[]
+  blockedUsers        Block[]     @relation("BlockedBy")
+  blockedByUsers      Block[]     @relation("BlockedUser")
+  reports             Report[]    @relation("Reporter")
+  reportedBy          Report[]    @relation("ReportedUser")
+  contacts            Contact[]   @relation("ContactOwner")
+
+  @@index([phone])
+  @@index([email])
+  @@index([username])
+}
+
+// ===== AUTH & SESSIONS =====
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  refreshToken String   @unique
+  deviceInfo   String?
+  ipAddress    String?
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([refreshToken])
+}
+
+model OTP {
+  id        String   @id @default(cuid())
+  target    String
+  code      String
+  attempts  Int      @default(0)
+  expiresAt DateTime
+  verified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([target, code])
+}
+
+// ===== CONVERSATIONS & MESSAGES =====
+
+model Conversation {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  members  ConversationMember[]
+  messages Message[]
+  calls    Call[]
+
+  @@index([updatedAt])
+}
+
+model ConversationMember {
+  id             String   @id @default(cuid())
+  conversationId String
+  userId         String
+  lastReadAt     DateTime @default(now())
+  isMuted        Boolean  @default(false)
+  isArchived     Boolean  @default(false)
+  joinedAt       DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([conversationId, userId])
+  @@index([userId])
+}
+
+model Message {
+  id             String      @id @default(cuid())
+  conversationId String
+  senderId       String
+  content        String?
+  type           MessageType @default(TEXT)
+  replyToId      String?
+
+  isDeleted Boolean   @default(false)
+  deletedAt DateTime?
+
+  deliveredAt DateTime?
+  readAt      DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender       User         @relation("SentMessages", fields: [senderId], references: [id])
+  replyTo      Message?     @relation("Replies", fields: [replyToId], references: [id])
+  replies      Message[]    @relation("Replies")
+  attachments  Attachment[]
+
+  @@index([conversationId, createdAt])
+  @@index([senderId])
+}
+
+model Attachment {
+  id           String         @id @default(cuid())
+  messageId    String
+  url          String
+  type         AttachmentType
+  fileName     String?
+  fileSize     Int
+  mimeType     String
+  width        Int?
+  height       Int?
+  duration     Int?
+  thumbnailUrl String?
+
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+}
+
+// ===== CALLS =====
+
+model Call {
+  id             String     @id @default(cuid())
+  conversationId String
+  callerId       String
+  calleeId       String
+  type           CallType
+  status         CallStatus @default(RINGING)
+  startedAt      DateTime?
+  endedAt        DateTime?
+  duration       Int?
+  createdAt      DateTime   @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id])
+  caller       User         @relation("CallerCalls", fields: [callerId], references: [id])
+  callee       User         @relation("CalleeCalls", fields: [calleeId], references: [id])
+
+  @@index([callerId, createdAt])
+  @@index([calleeId, createdAt])
+}
+
+// ===== CONTACTS & SOCIAL =====
+
+model Contact {
+  id            String  @id @default(cuid())
+  ownerId       String
+  phone         String
+  matchedUserId String?
+  name          String?
+
+  owner User @relation("ContactOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@unique([ownerId, phone])
+  @@index([phone])
+}
+
+model Block {
+  id            String   @id @default(cuid())
+  blockedById   String
+  blockedUserId String
+  createdAt     DateTime @default(now())
+
+  blockedBy   User @relation("BlockedBy", fields: [blockedById], references: [id], onDelete: Cascade)
+  blockedUser User @relation("BlockedUser", fields: [blockedUserId], references: [id], onDelete: Cascade)
+
+  @@unique([blockedById, blockedUserId])
+}
+
+model Report {
+  id             String       @id @default(cuid())
+  reporterId     String
+  reportedUserId String
+  reason         ReportReason
+  description    String?
+  createdAt      DateTime     @default(now())
+
+  reporter     User @relation("Reporter", fields: [reporterId], references: [id])
+  reportedUser User @relation("ReportedUser", fields: [reportedUserId], references: [id])
+}
+
+// ===== PUSH =====
+
+model PushToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  platform  Platform
+  isVoIP    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+// ===== ENUMS =====
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+  PREFER_NOT_TO_SAY
+}
+
+enum PhoneVisibility {
+  EVERYONE
+  CONTACTS_ONLY
+  NOBODY
+}
+
+enum Visibility {
+  EVERYONE
+  CONTACTS_ONLY
+  NOBODY
+}
+
+enum MessageType {
+  TEXT
+  IMAGE
+  VIDEO
+  VOICE
+  DOCUMENT
+  SYSTEM
+}
+
+enum AttachmentType {
+  IMAGE
+  VIDEO
+  AUDIO
+  DOCUMENT
+}
+
+enum CallType {
+  VOICE
+  VIDEO
+}
+
+enum CallStatus {
+  RINGING
+  ONGOING
+  ENDED
+  MISSED
+  REJECTED
+  BUSY
+}
+
+enum Platform {
+  IOS
+  ANDROID
+}
+
+enum ReportReason {
+  SPAM
+  HARASSMENT
+  INAPPROPRIATE_CONTENT
+  FAKE_ACCOUNT
+  OTHER
+}
