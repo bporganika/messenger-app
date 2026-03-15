@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import Svg, { Path, Circle } from 'react-native-svg';
 import { useTheme } from '../../design-system';
 import { spacing, radius } from '../../design-system/tokens';
@@ -33,6 +34,7 @@ function ChevronRight({ color }: { color: string }) {
 export function SettingsScreen({
   navigation,
 }: SettingsScreenProps<'Settings'>) {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const user = useAuthStore((s) => s.user);
@@ -45,7 +47,7 @@ export function SettingsScreen({
           <Circle cx={12} cy={7} r={4} stroke={colors.textSecondary} strokeWidth={1.5} />
         </Svg>
       ),
-      label: 'Edit Profile',
+      label: t('settings.editProfile'),
       screen: 'EditProfile',
     },
     {
@@ -54,7 +56,7 @@ export function SettingsScreen({
           <Path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" stroke={colors.textSecondary} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
         </Svg>
       ),
-      label: 'Notifications',
+      label: t('settings.notifications'),
       screen: 'Notifications',
     },
     {
@@ -63,7 +65,7 @@ export function SettingsScreen({
           <Path d="M19 11H5M19 11a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2M19 11V9a7 7 0 00-14 0v2" stroke={colors.textSecondary} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
         </Svg>
       ),
-      label: 'Privacy',
+      label: t('settings.privacy'),
       screen: 'Privacy',
     },
     {
@@ -73,7 +75,7 @@ export function SettingsScreen({
           <Path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" stroke={colors.textSecondary} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
         </Svg>
       ),
-      label: 'Language',
+      label: t('settings.language'),
       screen: 'Language',
     },
     {
@@ -83,7 +85,7 @@ export function SettingsScreen({
           <Path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" stroke={colors.textSecondary} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
         </Svg>
       ),
-      label: 'Appearance',
+      label: t('settings.appearance'),
       screen: 'Appearance',
     },
     {
@@ -92,7 +94,7 @@ export function SettingsScreen({
           <Path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke={colors.textSecondary} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
         </Svg>
       ),
-      label: 'App Lock',
+      label: t('settings.appLock'),
       screen: 'AppLock',
     },
     {
@@ -101,7 +103,7 @@ export function SettingsScreen({
           <Path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" stroke={colors.textSecondary} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" />
         </Svg>
       ),
-      label: 'Storage & Data',
+      label: t('settings.storageData'),
       screen: 'Storage',
     },
   ];
@@ -115,7 +117,7 @@ export function SettingsScreen({
       }}>
       {/* Header */}
       <View style={styles.header}>
-        <Text variant="displayLg">Settings</Text>
+        <Text variant="displayLg">{t('settings.title')}</Text>
       </View>
 
       {/* Profile card */}
@@ -138,10 +140,10 @@ export function SettingsScreen({
         />
         <View style={styles.profileInfo}>
           <Text variant="title">
-            {user ? `${user.firstName} ${user.lastName}` : 'User'}
+            {user ? `${user.firstName} ${user.lastName}` : t('settings.defaultUser')}
           </Text>
           <Text variant="bodySm" color={colors.textSecondary}>
-            @{user?.username ?? 'username'}
+            @{user?.username ?? t('settings.defaultUsername')}
           </Text>
         </View>
         <ChevronRight color={colors.textTertiary} />
@@ -198,7 +200,7 @@ export function SettingsScreen({
           />
         </Svg>
         <Text variant="body" color={colors.accentError}>
-          Delete Account
+          {t('settings.deleteAccount')}
         </Text>
       </Pressable>
 
@@ -208,7 +210,7 @@ export function SettingsScreen({
         color={colors.textTertiary}
         align="center"
         style={styles.version}>
-        Pulse v1.0.0
+        {t('settings.version')}
       </Text>
     </ScrollView>
   );

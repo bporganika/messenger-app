@@ -7,41 +7,45 @@ import Animated, {
   withSpring,
 } from 'react-native-reanimated';
 import Svg, { Path } from 'react-native-svg';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../design-system';
 import { springs } from '../../design-system/animations';
 import { spacing, radius } from '../../design-system/tokens';
 import { haptics } from '../../design-system/haptics';
 import { Text, Divider } from '../../components/ui';
+import { changeLanguage, getCurrentLanguage } from '../../i18n';
 
 interface Language {
   code: string;
-  label: string;
+  labelKey: string;
   native: string;
   flag: string;
 }
 
 const LANGUAGES: Language[] = [
-  { code: 'en', label: 'English', native: 'English', flag: '🇬🇧' },
-  { code: 'tr', label: 'Turkish', native: 'Türkçe', flag: '🇹🇷' },
-  { code: 'de', label: 'German', native: 'Deutsch', flag: '🇩🇪' },
-  { code: 'fr', label: 'French', native: 'Français', flag: '🇫🇷' },
+  { code: 'en', labelKey: 'languageScreen.en', native: 'English', flag: '🇬🇧' },
+  { code: 'tr', labelKey: 'languageScreen.tr', native: 'Türkçe', flag: '🇹🇷' },
+  { code: 'de', labelKey: 'languageScreen.de', native: 'Deutsch', flag: '🇩🇪' },
+  { code: 'fr', labelKey: 'languageScreen.fr', native: 'Français', flag: '🇫🇷' },
 ];
 
 export function LanguageScreen() {
+  const { t } = useTranslation();
   const { colors } = useTheme();
-  const [selected, setSelected] = useState('en');
+  const [selected, setSelected] = useState(getCurrentLanguage());
 
   const handleSelect = useCallback((code: string) => {
     haptics.buttonPress();
     setSelected(code);
-    // TODO: PATCH /api/v1/users/me { language: code } + change i18n locale
+    changeLanguage(code);
+    // TODO: PATCH /api/v1/users/me { language: code }
   }, []);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.bgPrimary }]}>
       <Animated.View entering={FadeInUp.springify()}>
         <Text variant="caption" color={colors.textTertiary} style={styles.sectionLabel}>
-          APP LANGUAGE
+          {t('languageScreen.section')}
         </Text>
         <View style={[styles.section, { backgroundColor: colors.surfaceDefault, borderColor: colors.borderDefault }]}>
           {LANGUAGES.map((lang, i) => (
@@ -59,7 +63,7 @@ export function LanguageScreen() {
 
       <Animated.View entering={FadeInUp.springify().delay(100)}>
         <Text variant="caption" color={colors.textTertiary} style={styles.hint}>
-          The app will restart to apply the new language
+          {t('languageScreen.hint')}
         </Text>
       </Animated.View>
     </View>
@@ -75,6 +79,7 @@ function LanguageRow({
   isSelected: boolean;
   onPress: () => void;
 }) {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const scale = useSharedValue(1);
 
@@ -94,7 +99,7 @@ function LanguageRow({
             {lang.native}
           </Text>
           <Text variant="caption" color={colors.textTertiary}>
-            {lang.label}
+            {t(lang.labelKey)}
           </Text>
         </View>
         {isSelected && (

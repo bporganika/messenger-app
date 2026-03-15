@@ -1,3 +1,4 @@
+import './i18n';
 import React, { useEffect, useRef } from 'react';
 import { AppState, StatusBar } from 'react-native';
 import type { AppStateStatus } from 'react-native';

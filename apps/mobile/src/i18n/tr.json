@@ -1,0 +1,234 @@
+{
+  "common": {
+    "save": "Değişiklikleri kaydet",
+    "cancel": "İptal",
+    "delete": "Sil",
+    "confirm": "Onayla",
+    "loading": "Yükleniyor...",
+    "error": "Bir hata oluştu",
+    "retry": "Tekrar dene"
+  },
+  "tabs": {
+    "chats": "Sohbetler",
+    "calls": "Aramalar",
+    "contacts": "Kişiler",
+    "settings": "Ayarlar"
+  },
+  "welcome": {
+    "title": "Hoş geldiniz",
+    "titleBrand": "Pulse",
+    "subtitle": "Önemli insanlarla\nbağlantıda kalın",
+    "continueApple": "Apple ile devam et",
+    "continueGoogle": "Google ile devam et",
+    "usePhone": "Telefon numarası kullan",
+    "useEmail": "E-posta kullan",
+    "terms": "Devam ederek şunları kabul etmiş olursunuz:",
+    "termsLink": "Kullanım Şartları",
+    "privacyLink": "Gizlilik Politikası"
+  },
+  "phoneAuth": {
+    "title": "Telefon numaranız\nnedir?",
+    "subtitle": "Numaranızı doğrulamak için bir kod göndereceğiz",
+    "sendCode": "Kod Gönder",
+    "selectCountry": "Ülke seçin",
+    "searchCountry": "Ülke veya kod ara...",
+    "noCountries": "Ülke bulunamadı"
+  },
+  "emailAuth": {
+    "title": "E-posta adresiniz\nnedir?",
+    "subtitle": "Size bir doğrulama kodu göndereceğiz",
+    "placeholder": "siz@ornek.com",
+    "sendCode": "Kod Gönder"
+  },
+  "otp": {
+    "title": "Kodu girin",
+    "sentTo": "{{target}} adresine gönderildi",
+    "resendIn": "Kodu tekrar gönder: {{time}}",
+    "resend": "Kodu tekrar gönder"
+  },
+  "profileSetup": {
+    "title": "Profilinizi oluşturun",
+    "addPhoto": "Fotoğraf ekle",
+    "firstName": "Ad",
+    "firstNamePlaceholder": "Ahmet",
+    "lastName": "Soyad",
+    "lastNamePlaceholder": "Yılmaz",
+    "username": "Kullanıcı adı",
+    "usernamePlaceholder": "ahmetyilmaz",
+    "usernameTaken": "Kullanıcı adı alınmış",
+    "usernameAvailable": "Kullanıcı adı uygun",
+    "gender": "Cinsiyet",
+    "genderMale": "Erkek",
+    "genderFemale": "Kadın",
+    "genderOther": "Diğer",
+    "genderPreferNot": "Belirtmek istemiyorum",
+    "complete": "Kurulumu Tamamla",
+    "profilePhoto": "Profil fotoğrafı",
+    "takePhoto": "Fotoğraf çek",
+    "chooseGallery": "Galeriden seç",
+    "removePhoto": "Fotoğrafı kaldır"
+  },
+  "settings": {
+    "title": "Ayarlar",
+    "editProfile": "Profili Düzenle",
+    "notifications": "Bildirimler",
+    "privacy": "Gizlilik",
+    "language": "Dil",
+    "appearance": "Görünüm",
+    "appLock": "Uygulama Kilidi",
+    "storageData": "Depolama ve Veri",
+    "deleteAccount": "Hesabı Sil",
+    "version": "Pulse v1.0.0",
+    "defaultUser": "Kullanıcı",
+    "defaultUsername": "kullaniciadi"
+  },
+  "editProfile": {
+    "firstName": "Ad",
+    "lastName": "Soyad",
+    "username": "Kullanıcı adı",
+    "usernameTaken": "Bu kullanıcı adı zaten alınmış",
+    "changePhoto": "Fotoğrafı değiştir",
+    "takePhoto": "Fotoğraf çek",
+    "chooseGallery": "Galeriden seç",
+    "removePhoto": "Fotoğrafı kaldır",
+    "save": "Değişiklikleri kaydet"
+  },
+  "notifications": {
+    "messagesSection": "MESAJLAR",
+    "sound": "Ses",
+    "soundDesc": "Yeni mesajlarda ses çal",
+    "vibration": "Titreşim",
+    "vibrationDesc": "Yeni mesajlarda titret",
+    "previews": "Mesaj önizlemesi",
+    "previewsDesc": "Bildirimlerde mesaj metnini göster",
+    "quietSection": "SESSİZ MOD",
+    "muteAll": "Tümünü sessize al",
+    "muteAllDesc": "Ses ve titreşimi kapat"
+  },
+  "privacy": {
+    "section": "KİM GÖREBİLİR",
+    "phoneNumber": "Telefon numarası",
+    "lastSeen": "Son görülme",
+    "profilePhoto": "Profil fotoğrafı",
+    "everyone": "Herkes",
+    "contactsOnly": "Sadece kişiler",
+    "nobody": "Kimse",
+    "hint": "Görünürlük seçeneklerini değiştirmek için her satıra dokunun.\nDeğişiklikler otomatik kaydedilir."
+  },
+  "languageScreen": {
+    "section": "UYGULAMA DİLİ",
+    "hint": "Yeni dili uygulamak için uygulama yeniden başlatılacak",
+    "en": "İngilizce",
+    "tr": "Türkçe",
+    "de": "Almanca",
+    "fr": "Fransızca"
+  },
+  "appearance": {
+    "section": "TEMA",
+    "light": "Açık",
+    "dark": "Koyu",
+    "auto": "Otomatik",
+    "autoHint": "Tema cihaz ayarlarınızı takip eder",
+    "lightHint": "Açık tema her zaman aktif",
+    "darkHint": "Koyu tema her zaman aktif"
+  },
+  "appLock": {
+    "biometricSection": "BİYOMETRİK",
+    "biometric": "Face ID / Touch ID",
+    "biometricDesc": "Biyometrik kimlik doğrulama ile aç",
+    "pinSection": "PIN KODU",
+    "pin": "4 haneli PIN",
+    "pinSet": "PIN ayarlandı",
+    "pinNotSet": "Uygulamayı kilitlemek için PIN ayarlayın",
+    "pinPlaceholder": "4 haneli PIN girin",
+    "hint": "Etkinleştirildiğinde, Pulse uygulamayı her açtığınızda kimlik doğrulama isteyecektir.",
+    "biometricFallback": " Önce biyometrik denenecek, PIN yedek olarak kullanılacak.",
+    "confirmBiometric": "Biyometrik kilidi etkinleştirmek için onaylayın"
+  },
+  "storage": {
+    "totalCache": "Kullanılan toplam önbellek",
+    "breakdown": "DAĞILIM",
+    "images": "Resimler",
+    "videos": "Videolar",
+    "voiceMessages": "Sesli mesajlar",
+    "documents": "Belgeler",
+    "clearCache": "Tüm önbelleği temizle",
+    "clearing": "Temizleniyor...",
+    "clearHint": "Önbelleği temizlemek yerel olarak saklanan medyayı kaldıracaktır. Mesajlarınız ve sohbetleriniz etkilenmeyecektir."
+  },
+  "deleteAccountScreen": {
+    "title": "Hesabınızı silmek mi istiyorsunuz?",
+    "consequence1": "Tüm mesajlarınız kalıcı olarak silinecek",
+    "consequence2": "Kişileriniz ve sohbet geçmişiniz silinecek",
+    "consequence3": "Kullanıcı adınız başkaları için kullanılabilir olacak",
+    "consequence4": "Bu işlem 30 gün sonra geri alınamaz",
+    "confirmLabel": "Onaylamak için <bold>SİL</bold> yazın",
+    "confirmPlaceholder": "SİL yazın",
+    "deleteButton": "Hesabımı sil"
+  },
+  "lock": {
+    "title": "Pulse kilitli",
+    "enterPin": "Kilidini açmak için PIN'inizi girin",
+    "wrongPin": "Yanlış PIN",
+    "tooManyAttempts": "Çok fazla deneme. {{cooldown}} saniye sonra tekrar deneyin",
+    "unlockBiometric": "Pulse'ın kilidini aç"
+  },
+  "voiceCall": {
+    "calling": "Aranıyor...",
+    "connecting": "Bağlanıyor...",
+    "ended": "Arama sonlandı",
+    "mute": "Sessize Al",
+    "speaker": "Hoparlör",
+    "video": "Video",
+    "end": "Bitir"
+  },
+  "calls": {
+    "incoming": "Gelen",
+    "outgoing": "Giden",
+    "missed": "Cevapsız",
+    "voice": "Sesli",
+    "videoType": "Görüntülü",
+    "title": "Aramalar",
+    "noCalls": "Henüz arama yok",
+    "noCallsDesc": "Arama geçmişiniz burada görünecek"
+  },
+  "videoCall": {
+    "mute": "Sustur",
+    "flip": "Çevir",
+    "video": "Video",
+    "end": "Bitir",
+    "you": "Siz"
+  },
+  "chat": {
+    "photo": "Fotoğraf",
+    "videoType": "Video",
+    "voiceMessage": "Sesli mesaj",
+    "document": "Belge",
+    "search": "Ara...",
+    "archive": "Arşivle",
+    "deleteConversation": "Konuşmayı sil",
+    "deleteConversationMsg": "{{name}} ile olan konuşmanızı silmek istiyor musunuz? Bu işlem geri alınamaz.",
+    "noResults": "\"{{query}}\" için sonuç bulunamadı",
+    "tryDifferent": "Farklı bir arama terimi deneyin",
+    "noConversations": "Henüz konuşma yok",
+    "noConversationsDesc": "Mesajlaşmaya başlamak için biriyle sohbet başlatın",
+    "startChat": "Sohbet başlat",
+    "typing": "yazıyor...",
+    "online": "Çevrimiçi",
+    "noMessages": "Henüz mesaj yok.\nMerhaba deyin!",
+    "messagePlaceholder": "Mesaj...",
+    "attach": "Ekle",
+    "camera": "Kamera",
+    "gallery": "Galeri",
+    "you": "Siz"
+  },
+  "contacts": {
+    "inviteFriends": "Arkadaşlarını davet et",
+    "inviteSubtitle": "Arkadaşlarınızı Pulse'a davet etmek için kişisel bağlantınızı paylaşın",
+    "shareLink": "Davet bağlantısını paylaş",
+    "shareMessage": "Pulse Messenger'a katıl! {{link}}",
+    "searchPlaceholder": "@kullanıcı adı veya telefon numarası ile ara",
+    "syncContacts": "Kişileri senkronize et",
+    "onPulse": "PULSE'DA"
+  }
+}

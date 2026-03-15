@@ -1,0 +1,234 @@
+{
+  "common": {
+    "save": "Enregistrer les modifications",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "confirm": "Confirmer",
+    "loading": "Chargement...",
+    "error": "Une erreur est survenue",
+    "retry": "Réessayer"
+  },
+  "tabs": {
+    "chats": "Discussions",
+    "calls": "Appels",
+    "contacts": "Contacts",
+    "settings": "Paramètres"
+  },
+  "welcome": {
+    "title": "Bienvenue sur",
+    "titleBrand": "Pulse",
+    "subtitle": "Restez connecté avec\nles personnes qui comptent",
+    "continueApple": "Continuer avec Apple",
+    "continueGoogle": "Continuer avec Google",
+    "usePhone": "Utiliser un numéro de téléphone",
+    "useEmail": "Utiliser l'e-mail",
+    "terms": "En continuant, vous acceptez nos",
+    "termsLink": "Conditions d'utilisation",
+    "privacyLink": "Politique de confidentialité"
+  },
+  "phoneAuth": {
+    "title": "Quel est votre\nnuméro de téléphone ?",
+    "subtitle": "Nous vous enverrons un code de vérification",
+    "sendCode": "Envoyer le code",
+    "selectCountry": "Choisir un pays",
+    "searchCountry": "Rechercher un pays ou un indicatif...",
+    "noCountries": "Aucun pays trouvé"
+  },
+  "emailAuth": {
+    "title": "Quelle est votre\nadresse e-mail ?",
+    "subtitle": "Nous vous enverrons un code de vérification",
+    "placeholder": "vous@exemple.fr",
+    "sendCode": "Envoyer le code"
+  },
+  "otp": {
+    "title": "Entrez le code",
+    "sentTo": "Envoyé à {{target}}",
+    "resendIn": "Renvoyer le code dans {{time}}",
+    "resend": "Renvoyer le code"
+  },
+  "profileSetup": {
+    "title": "Configurer votre profil",
+    "addPhoto": "Ajouter une photo",
+    "firstName": "Prénom",
+    "firstNamePlaceholder": "Jean",
+    "lastName": "Nom",
+    "lastNamePlaceholder": "Dupont",
+    "username": "Nom d'utilisateur",
+    "usernamePlaceholder": "jeandupont",
+    "usernameTaken": "Nom d'utilisateur déjà pris",
+    "usernameAvailable": "Nom d'utilisateur disponible",
+    "gender": "Genre",
+    "genderMale": "Homme",
+    "genderFemale": "Femme",
+    "genderOther": "Autre",
+    "genderPreferNot": "Préfère ne pas dire",
+    "complete": "Terminer la configuration",
+    "profilePhoto": "Photo de profil",
+    "takePhoto": "Prendre une photo",
+    "chooseGallery": "Choisir dans la galerie",
+    "removePhoto": "Supprimer la photo"
+  },
+  "settings": {
+    "title": "Paramètres",
+    "editProfile": "Modifier le profil",
+    "notifications": "Notifications",
+    "privacy": "Confidentialité",
+    "language": "Langue",
+    "appearance": "Apparence",
+    "appLock": "Verrouillage",
+    "storageData": "Stockage et données",
+    "deleteAccount": "Supprimer le compte",
+    "version": "Pulse v1.0.0",
+    "defaultUser": "Utilisateur",
+    "defaultUsername": "utilisateur"
+  },
+  "editProfile": {
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "username": "Nom d'utilisateur",
+    "usernameTaken": "Ce nom d'utilisateur est déjà pris",
+    "changePhoto": "Changer la photo",
+    "takePhoto": "Prendre une photo",
+    "chooseGallery": "Choisir dans la galerie",
+    "removePhoto": "Supprimer la photo",
+    "save": "Enregistrer les modifications"
+  },
+  "notifications": {
+    "messagesSection": "MESSAGES",
+    "sound": "Son",
+    "soundDesc": "Jouer un son pour les nouveaux messages",
+    "vibration": "Vibration",
+    "vibrationDesc": "Vibrer pour les nouveaux messages",
+    "previews": "Aperçu des messages",
+    "previewsDesc": "Afficher le texte dans les notifications",
+    "quietSection": "MODE SILENCIEUX",
+    "muteAll": "Tout couper",
+    "muteAllDesc": "Désactiver le son et la vibration"
+  },
+  "privacy": {
+    "section": "QUI PEUT VOIR",
+    "phoneNumber": "Numéro de téléphone",
+    "lastSeen": "Dernière connexion",
+    "profilePhoto": "Photo de profil",
+    "everyone": "Tout le monde",
+    "contactsOnly": "Contacts uniquement",
+    "nobody": "Personne",
+    "hint": "Appuyez sur chaque ligne pour changer la visibilité.\nLes modifications sont enregistrées automatiquement."
+  },
+  "languageScreen": {
+    "section": "LANGUE DE L'APPLICATION",
+    "hint": "L'application redémarrera pour appliquer la nouvelle langue",
+    "en": "Anglais",
+    "tr": "Turc",
+    "de": "Allemand",
+    "fr": "Français"
+  },
+  "appearance": {
+    "section": "THÈME",
+    "light": "Clair",
+    "dark": "Sombre",
+    "auto": "Automatique",
+    "autoHint": "Le thème suit les paramètres de votre appareil",
+    "lightHint": "Le thème clair est toujours actif",
+    "darkHint": "Le thème sombre est toujours actif"
+  },
+  "appLock": {
+    "biometricSection": "BIOMÉTRIE",
+    "biometric": "Face ID / Touch ID",
+    "biometricDesc": "Déverrouiller avec l'authentification biométrique",
+    "pinSection": "CODE PIN",
+    "pin": "PIN à 4 chiffres",
+    "pinSet": "PIN défini",
+    "pinNotSet": "Définir un PIN pour verrouiller l'application",
+    "pinPlaceholder": "Entrez un PIN à 4 chiffres",
+    "hint": "Lorsqu'il est activé, Pulse demandera une authentification à chaque ouverture.",
+    "biometricFallback": " La biométrie sera essayée en premier, le PIN en secours.",
+    "confirmBiometric": "Confirmez pour activer le verrouillage biométrique"
+  },
+  "storage": {
+    "totalCache": "Cache total utilisé",
+    "breakdown": "RÉPARTITION",
+    "images": "Images",
+    "videos": "Vidéos",
+    "voiceMessages": "Messages vocaux",
+    "documents": "Documents",
+    "clearCache": "Vider tout le cache",
+    "clearing": "Suppression...",
+    "clearHint": "Vider le cache supprimera les médias stockés localement. Vos messages et conversations ne seront pas affectés."
+  },
+  "deleteAccountScreen": {
+    "title": "Supprimer votre compte ?",
+    "consequence1": "Tous vos messages seront définitivement supprimés",
+    "consequence2": "Vos contacts et l'historique des discussions seront effacés",
+    "consequence3": "Votre nom d'utilisateur sera disponible pour d'autres",
+    "consequence4": "Cette action ne peut pas être annulée après 30 jours",
+    "confirmLabel": "Tapez <bold>SUPPRIMER</bold> pour confirmer",
+    "confirmPlaceholder": "Tapez SUPPRIMER",
+    "deleteButton": "Supprimer mon compte"
+  },
+  "lock": {
+    "title": "Pulse est verrouillé",
+    "enterPin": "Entrez votre PIN pour déverrouiller",
+    "wrongPin": "PIN incorrect",
+    "tooManyAttempts": "Trop de tentatives. Réessayez dans {{cooldown}}s",
+    "unlockBiometric": "Déverrouiller Pulse"
+  },
+  "voiceCall": {
+    "calling": "Appel...",
+    "connecting": "Connexion...",
+    "ended": "Appel terminé",
+    "mute": "Muet",
+    "speaker": "Haut-parleur",
+    "video": "Vidéo",
+    "end": "Fin"
+  },
+  "calls": {
+    "incoming": "Entrant",
+    "outgoing": "Sortant",
+    "missed": "Manqué",
+    "voice": "Voix",
+    "videoType": "Vidéo",
+    "title": "Appels",
+    "noCalls": "Aucun appel",
+    "noCallsDesc": "Votre historique d'appels apparaîtra ici"
+  },
+  "videoCall": {
+    "mute": "Muet",
+    "flip": "Retourner",
+    "video": "Vidéo",
+    "end": "Terminer",
+    "you": "Vous"
+  },
+  "chat": {
+    "photo": "Photo",
+    "videoType": "Vidéo",
+    "voiceMessage": "Message vocal",
+    "document": "Document",
+    "search": "Rechercher...",
+    "archive": "Archiver",
+    "deleteConversation": "Supprimer la conversation",
+    "deleteConversationMsg": "Supprimer votre conversation avec {{name}} ? Cette action est irréversible.",
+    "noResults": "Aucun résultat pour \"{{query}}\"",
+    "tryDifferent": "Essayez un autre terme de recherche",
+    "noConversations": "Aucune conversation",
+    "noConversationsDesc": "Commencez une discussion pour envoyer des messages",
+    "startChat": "Démarrer un chat",
+    "typing": "écrit...",
+    "online": "En ligne",
+    "noMessages": "Pas encore de messages.\nDites bonjour !",
+    "messagePlaceholder": "Message...",
+    "attach": "Joindre",
+    "camera": "Appareil photo",
+    "gallery": "Galerie",
+    "you": "Vous"
+  },
+  "contacts": {
+    "inviteFriends": "Inviter des amis",
+    "inviteSubtitle": "Partagez votre lien personnel pour inviter des amis sur Pulse",
+    "shareLink": "Partager le lien d'invitation",
+    "shareMessage": "Rejoins-moi sur Pulse Messenger ! {{link}}",
+    "searchPlaceholder": "Rechercher par @nom d'utilisateur ou numéro",
+    "syncContacts": "Synchroniser les contacts",
+    "onPulse": "SUR PULSE"
+  }
+}

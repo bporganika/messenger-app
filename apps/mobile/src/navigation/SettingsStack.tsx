@@ -1,5 +1,6 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../design-system';
 import { SettingsScreen } from '../screens/settings/SettingsScreen';
 import { EditProfileScreen } from '../screens/settings/EditProfileScreen';
@@ -16,6 +17,7 @@ const Stack = createNativeStackNavigator<SettingsStackParamList>();
 
 export function SettingsStack() {
   const { colors } = useTheme();
+  const { t } = useTranslation();
 
   return (
     <Stack.Navigator
@@ -33,42 +35,42 @@ export function SettingsStack() {
       <Stack.Screen
         name="EditProfile"
         component={EditProfileScreen}
-        options={{ title: 'Edit Profile' }}
+        options={{ title: t('settings.editProfile') }}
       />
       <Stack.Screen
         name="Notifications"
         component={NotificationsScreen}
-        options={{ title: 'Notifications' }}
+        options={{ title: t('settings.notifications') }}
       />
       <Stack.Screen
         name="Privacy"
         component={PrivacyScreen}
-        options={{ title: 'Privacy' }}
+        options={{ title: t('settings.privacy') }}
       />
       <Stack.Screen
         name="Language"
         component={LanguageScreen}
-        options={{ title: 'Language' }}
+        options={{ title: t('settings.language') }}
       />
       <Stack.Screen
         name="Appearance"
         component={AppearanceScreen}
-        options={{ title: 'Appearance' }}
+        options={{ title: t('settings.appearance') }}
       />
       <Stack.Screen
         name="Storage"
         component={StorageScreen}
-        options={{ title: 'Storage & Data' }}
+        options={{ title: t('settings.storageData') }}
       />
       <Stack.Screen
         name="AppLock"
         component={AppLockScreen}
-        options={{ title: 'App Lock' }}
+        options={{ title: t('settings.appLock') }}
       />
       <Stack.Screen
         name="DeleteAccount"
         component={DeleteAccountScreen}
-        options={{ title: 'Delete Account' }}
+        options={{ title: t('settings.deleteAccount') }}
       />
     </Stack.Navigator>
   );

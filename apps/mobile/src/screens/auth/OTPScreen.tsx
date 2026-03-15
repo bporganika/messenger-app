@@ -23,6 +23,7 @@ import { timing } from '../../design-system/animations';
 import { fontFamily, typography } from '../../design-system/typography';
 import { haptics } from '../../design-system/haptics';
 import { Text } from '../../components/ui';
+import { useTranslation } from 'react-i18next';
 import type { AuthScreenProps } from '../../navigation/types';
 
 const CODE_LENGTH = 6;
@@ -119,6 +120,7 @@ export function OTPScreen({ navigation, route }: AuthScreenProps<'OTP'>) {
   const { target } = route.params;
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
 
   const [code, setCode] = useState('');
   const [error, setError] = useState(false);
@@ -257,10 +259,10 @@ export function OTPScreen({ navigation, route }: AuthScreenProps<'OTP'>) {
       {/* Heading */}
       <Animated.View entering={FadeInUp.delay(100).springify()}>
         <Text variant="heading" style={styles.heading}>
-          Enter the code
+          {t('otp.title')}
         </Text>
         <Text variant="bodySm" color={colors.textSecondary} style={styles.sub}>
-          Sent to {target}
+          {t('otp.sentTo', { target })}
         </Text>
       </Animated.View>
 
@@ -303,12 +305,12 @@ export function OTPScreen({ navigation, route }: AuthScreenProps<'OTP'>) {
         style={styles.resendWrap}>
         {resendTimer > 0 ? (
           <Text variant="mono" color={colors.textTertiary}>
-            Resend code in {formatTimer(resendTimer)}
+            {t('otp.resendIn', { time: formatTimer(resendTimer) })}
           </Text>
         ) : (
           <Pressable onPress={handleResend}>
             <Text variant="bodySm" color={colors.accentPrimary}>
-              Resend code
+              {t('otp.resend')}
             </Text>
           </Pressable>
         )}

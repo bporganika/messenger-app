@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, Pressable } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import Animated, {
   FadeInUp,
   useSharedValue,
@@ -16,19 +17,20 @@ import { Text } from '../../components/ui';
 
 interface ThemeOption {
   key: 'light' | 'dark' | 'auto';
-  label: string;
+  labelKey: string;
   previewBg: string;
   previewFg: string;
   previewAccent: string;
 }
 
 const OPTIONS: ThemeOption[] = [
-  { key: 'light', label: 'Light', previewBg: '#FFFFFF', previewFg: '#09090B', previewAccent: '#7C3AED' },
-  { key: 'dark', label: 'Dark', previewBg: '#09090B', previewFg: '#FAFAFA', previewAccent: '#7C3AED' },
-  { key: 'auto', label: 'Auto', previewBg: '#09090B', previewFg: '#FAFAFA', previewAccent: '#06B6D4' },
+  { key: 'light', labelKey: 'appearance.light', previewBg: '#FFFFFF', previewFg: '#09090B', previewAccent: '#7C3AED' },
+  { key: 'dark', labelKey: 'appearance.dark', previewBg: '#09090B', previewFg: '#FAFAFA', previewAccent: '#7C3AED' },
+  { key: 'auto', labelKey: 'appearance.auto', previewBg: '#09090B', previewFg: '#FAFAFA', previewAccent: '#06B6D4' },
 ];
 
 export function AppearanceScreen() {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const mode = useThemeStore((s) => s.mode);
   const setMode = useThemeStore((s) => s.setMode);
@@ -37,7 +39,7 @@ export function AppearanceScreen() {
     <View style={[styles.container, { backgroundColor: colors.bgPrimary }]}>
       <Animated.View entering={FadeInUp.springify()}>
         <Text variant="caption" color={colors.textTertiary} style={styles.sectionLabel}>
-          THEME
+          {t('appearance.section')}
         </Text>
         <View style={styles.cardsRow}>
           {OPTIONS.map((opt) => (
@@ -57,8 +59,8 @@ export function AppearanceScreen() {
       <Animated.View entering={FadeInUp.springify().delay(100)}>
         <Text variant="caption" color={colors.textTertiary} style={styles.hint}>
           {mode === 'auto'
-            ? 'Theme follows your device settings'
-            : `${mode === 'dark' ? 'Dark' : 'Light'} theme is always active`}
+            ? t('appearance.autoHint')
+            : mode === 'dark' ? t('appearance.darkHint') : t('appearance.lightHint')}
         </Text>
       </Animated.View>
     </View>
@@ -74,6 +76,7 @@ function ThemeCard({
   isSelected: boolean;
   onPress: () => void;
 }) {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const scale = useSharedValue(1);
   const animStyle = useAnimatedStyle(() => ({

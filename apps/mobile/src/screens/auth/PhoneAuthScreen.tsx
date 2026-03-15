@@ -16,6 +16,7 @@ import { spacing, radius } from '../../design-system/tokens';
 import { fontFamily, typography } from '../../design-system/typography';
 import { haptics } from '../../design-system/haptics';
 import { Text, Button, BottomSheet, Divider } from '../../components/ui';
+import { useTranslation } from 'react-i18next';
 import type { AuthScreenProps } from '../../navigation/types';
 
 // ─── Country data ────────────────────────────────────────
@@ -140,6 +141,7 @@ function SearchIcon({ color }: { color: string }) {
 export function PhoneAuthScreen({ navigation }: AuthScreenProps<'PhoneAuth'>) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const phoneInputRef = useRef<TextInput>(null);
 
   const [country, setCountry] = useState<Country>(DEFAULT_COUNTRY);
@@ -225,13 +227,13 @@ export function PhoneAuthScreen({ navigation }: AuthScreenProps<'PhoneAuth'>) {
         <Animated.View
           entering={FadeInUp.delay(100).springify().damping(20)}>
           <Text variant="heading" style={styles.heading}>
-            What's your{'\n'}phone number?
+            {t('phoneAuth.title')}
           </Text>
           <Text
             variant="bodySm"
             color={colors.textSecondary}
             style={styles.sub}>
-            We'll send you a code to verify your number
+            {t('phoneAuth.subtitle')}
           </Text>
         </Animated.View>
 
@@ -297,7 +299,7 @@ export function PhoneAuthScreen({ navigation }: AuthScreenProps<'PhoneAuth'>) {
         {/* Send Code */}
         <Animated.View entering={FadeInUp.delay(300).springify().damping(20)}>
           <Button
-            title="Send Code"
+            title={t('phoneAuth.sendCode')}
             variant="primary"
             size="lg"
             disabled={!isValid}
@@ -316,7 +318,7 @@ export function PhoneAuthScreen({ navigation }: AuthScreenProps<'PhoneAuth'>) {
         }}
         snapPoint={0.7}>
         <Text variant="title" style={styles.sheetTitle}>
-          Select country
+          {t('phoneAuth.selectCountry')}
         </Text>
 
         {/* Search */}
@@ -332,7 +334,7 @@ export function PhoneAuthScreen({ navigation }: AuthScreenProps<'PhoneAuth'>) {
           <TextInput
             value={search}
             onChangeText={setSearch}
-            placeholder="Search country or code..."
+            placeholder={t('phoneAuth.searchCountry')}
             placeholderTextColor={colors.textPlaceholder}
             autoCapitalize="none"
             autoCorrect={false}
@@ -382,7 +384,7 @@ export function PhoneAuthScreen({ navigation }: AuthScreenProps<'PhoneAuth'>) {
                 variant="bodySm"
                 color={colors.textTertiary}
                 align="center">
-                No countries found
+                {t('phoneAuth.noCountries')}
               </Text>
             </View>
           }

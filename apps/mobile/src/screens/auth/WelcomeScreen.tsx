@@ -14,6 +14,7 @@ import { springs } from '../../design-system/animations';
 import { spacing, radius, buttonHeight, brand } from '../../design-system/tokens';
 import { haptics } from '../../design-system/haptics';
 import { Text, Button } from '../../components/ui';
+import { useTranslation } from 'react-i18next';
 import type { AuthScreenProps } from '../../navigation/types';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
@@ -144,6 +145,7 @@ function stagger(index: number) {
 export function WelcomeScreen({ navigation }: AuthScreenProps<'Welcome'>) {
   const { colors, isDark } = useTheme();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
 
   // Logo entrance: scale 0 → 1 with springBouncy
   const logoProgress = useSharedValue(0);
@@ -174,9 +176,9 @@ export function WelcomeScreen({ navigation }: AuthScreenProps<'Welcome'>) {
       {/* ── Title ── */}
       <Animated.View entering={stagger(1)}>
         <Text variant="displayXl" align="center" color={brand.violet}>
-          Welcome to{' '}
+          {t('welcome.title')}{' '}
           <Text variant="displayXl" color={brand.cyan}>
-            Pulse
+            {t('welcome.titleBrand')}
           </Text>
         </Text>
       </Animated.View>
@@ -188,7 +190,7 @@ export function WelcomeScreen({ navigation }: AuthScreenProps<'Welcome'>) {
           color={colors.textSecondary}
           align="center"
           style={styles.subtitle}>
-          Connect with the people{'\n'}who matter most
+          {t('welcome.subtitle')}
         </Text>
       </Animated.View>
 
@@ -198,7 +200,7 @@ export function WelcomeScreen({ navigation }: AuthScreenProps<'Welcome'>) {
       {/* ── Continue with Apple ── */}
       <Animated.View entering={stagger(3)}>
         <SocialButton
-          title="Continue with Apple"
+          title={t('welcome.continueApple')}
           icon={<AppleIcon color="#FFFFFF" />}
           backgroundColor={isDark ? colors.bgTertiary : '#000000'}
           textColor="#FFFFFF"
@@ -212,7 +214,7 @@ export function WelcomeScreen({ navigation }: AuthScreenProps<'Welcome'>) {
       {/* ── Continue with Google ── */}
       <Animated.View entering={stagger(4)} style={styles.btnGap}>
         <SocialButton
-          title="Continue with Google"
+          title={t('welcome.continueGoogle')}
           icon={<GoogleIcon />}
           backgroundColor={isDark ? colors.surfaceDefault : '#FFFFFF'}
           textColor={colors.textPrimary}
@@ -226,7 +228,7 @@ export function WelcomeScreen({ navigation }: AuthScreenProps<'Welcome'>) {
       {/* ── Use phone number ── */}
       <Animated.View entering={stagger(5)} style={styles.btnGap}>
         <Button
-          title="Use phone number"
+          title={t('welcome.usePhone')}
           variant="primary"
           size="lg"
           onPress={() => navigation.navigate('PhoneAuth')}
@@ -242,7 +244,7 @@ export function WelcomeScreen({ navigation }: AuthScreenProps<'Welcome'>) {
           }}
           style={styles.emailLink}>
           <Text variant="bodySm" color={colors.textSecondary}>
-            Use email instead
+            {t('welcome.useEmail')}
           </Text>
         </Pressable>
       </Animated.View>
@@ -254,13 +256,13 @@ export function WelcomeScreen({ navigation }: AuthScreenProps<'Welcome'>) {
           color={colors.textTertiary}
           align="center"
           style={styles.terms}>
-          By continuing you agree to our{' '}
+          {t('welcome.terms')}{' '}
           <Text variant="caption" color={colors.accentPrimary}>
-            Terms
+            {t('welcome.termsLink')}
           </Text>
           {' & '}
           <Text variant="caption" color={colors.accentPrimary}>
-            Privacy Policy
+            {t('welcome.privacyLink')}
           </Text>
         </Text>
       </Animated.View>

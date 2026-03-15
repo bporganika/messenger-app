@@ -27,6 +27,7 @@ import { springs, timing } from '../../design-system/animations';
 import { spacing, radius } from '../../design-system/tokens';
 import { fontFamily, typography } from '../../design-system/typography';
 import { haptics } from '../../design-system/haptics';
+import { useTranslation } from 'react-i18next';
 import { Text, Avatar, Badge, EmptyState } from '../../components/ui';
 import { MessageStatus } from '../../components/chat/MessageStatus';
 import type { ChatScreenProps } from '../../navigation/types';
@@ -122,16 +123,17 @@ const DEMO_CONVERSATIONS: Conversation[] = [
 function getMessagePreview(
   type: MessageType,
   text: string | undefined,
+  t: (key: string) => string,
 ): string {
   switch (type) {
     case 'image':
-      return '📷 Photo';
+      return '📷 ' + t('chat.photo');
     case 'video':
-      return '🎬 Video';
+      return '🎬 ' + t('chat.videoType');
     case 'voice':
-      return '🎤 Voice message';
+      return '🎤 ' + t('chat.voiceMessage');
     case 'file':
-      return '📎 Document';
+      return '📎 ' + t('chat.document');
     default:
       return text ?? '';
   }
@@ -150,6 +152,7 @@ function SwipeableRow({
   onDelete: () => void;
 }) {
   const { colors } = useTheme();
+  const { t } = useTranslation();
   const translateX = useSharedValue(0);
   const rowHeight = useSharedValue<number | undefined>(undefined);
 
@@ -217,7 +220,7 @@ function SwipeableRow({
           />
         </Svg>
         <Text variant="caption" color="#FFFFFF" style={styles.swipeLabel}>
-          Archive
+          {t('chat.archive')}
         </Text>
       </Animated.View>
 
@@ -239,7 +242,7 @@ function SwipeableRow({
           />
         </Svg>
         <Text variant="caption" color="#FFFFFF" style={styles.swipeLabel}>
-          Delete
+          {t('common.delete')}
         </Text>
       </Animated.View>
 
@@ -264,6 +267,7 @@ function ChatRow({
   onLongPress: () => void;
 }) {
   const { colors } = useTheme();
+  const { t } = useTranslation();
   const scale = useSharedValue(1);
 
   const animStyle = useAnimatedStyle(() => ({
@@ -278,7 +282,7 @@ function ChatRow({
     scale.value = withSpring(1, springs.snappy);
   }, [scale]);
 
-  const preview = getMessagePreview(item.lastMessageType, item.lastMessage);
+  const preview = getMessagePreview(item.lastMessageType, item.lastMessage, t);
 
   return (
     <AnimatedPressable
@@ -354,6 +358,7 @@ function ItemSeparator() {
 // ─── Screen ─────────────────────────────────────────────
 export function ChatListScreen({ navigation }: ChatScreenProps<'ChatList'>) {
   const { colors } = useTheme();
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
 
   const [search, setSearch] = useState('');
@@ -394,12 +399,12 @@ export function ChatListScreen({ navigation }: ChatScreenProps<'ChatList'>) {
     (id: string, name: string) => {
       // TODO: replace Alert with custom modal
       Alert.alert(
-        'Delete conversation',
-        `Delete your conversation with ${name}? This cannot be undone.`,
+        t('chat.deleteConversation'),
+        t('chat.deleteConversationMsg', { name }),
         [
-          { text: 'Cancel', style: 'cancel' },
+          { text: t('common.cancel'), style: 'cancel' },
           {
-            text: 'Delete',
+            text: t('common.delete'),
             style: 'destructive',
             onPress: () => {
               setConversations((prev) => prev.filter((c) => c.id !== id));
@@ -416,15 +421,15 @@ export function ChatListScreen({ navigation }: ChatScreenProps<'ChatList'>) {
       // TODO: replace with custom context menu / bottom sheet
       Alert.alert(item.name, undefined, [
         {
-          text: 'Archive',
+          text: t('chat.archive'),
           onPress: () => handleArchive(item.id),
         },
         {
-          text: 'Delete',
+          text: t('common.delete'),
           style: 'destructive',
           onPress: () => handleDelete(item.id, item.name),
         },
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('common.cancel'), style: 'cancel' },
       ]);
     },
     [handleArchive, handleDelete],
@@ -464,7 +469,7 @@ export function ChatListScreen({ navigation }: ChatScreenProps<'ChatList'>) {
       ]}>
       {/* ── Header ── */}
       <Animated.View entering={FadeInUp.springify()} style={styles.header}>
-        <Text variant="displayLg">Chats</Text>
+        <Text variant="displayLg">{t('tabs.chats')}</Text>
         <Pressable
           onPress={() => {
             haptics.buttonPress();
@@ -520,7 +525,7 @@ export function ChatListScreen({ navigation }: ChatScreenProps<'ChatList'>) {
           onChangeText={setSearch}
           onFocus={() => setSearchFocused(true)}
           onBlur={() => setSearchFocused(false)}
-          placeholder="Search..."
+          placeholder={t('chat.search')}
           placeholderTextColor={colors.textPlaceholder}
           selectionColor={colors.accentPrimary}
           returnKeyType="search"
@@ -577,20 +582,20 @@ export function ChatListScreen({ navigation }: ChatScreenProps<'ChatList'>) {
                 variant="body"
                 color={colors.textTertiary}
                 align="center">
-                No results for &ldquo;{search}&rdquo;
+                {t('chat.noResults', { query: search })}
               </Text>
               <Text
                 variant="bodySm"
                 color={colors.textTertiary}
                 align="center"
                 style={styles.noResultsSub}>
-                Try a different search term
+                {t('chat.tryDifferent')}
               </Text>
             </View>
           ) : (
             <EmptyState
-              title="No conversations yet"
-              description="Start a chat with someone to begin messaging"
+              title={t('chat.noConversations')}
+              description={t('chat.noConversationsDesc')}
               icon={
                 <View
                   style={[
@@ -612,7 +617,7 @@ export function ChatListScreen({ navigation }: ChatScreenProps<'ChatList'>) {
                   </Svg>
                 </View>
               }
-              actionTitle="Start a chat"
+              actionTitle={t('chat.startChat')}
               onAction={() => {
                 // TODO: navigate to contacts or new chat picker
               }}

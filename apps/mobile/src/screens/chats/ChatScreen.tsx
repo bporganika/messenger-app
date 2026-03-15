@@ -16,6 +16,7 @@ import { useTheme } from '../../design-system';
 import { springs, timing } from '../../design-system/animations';
 import { spacing, radius } from '../../design-system/tokens';
 import { haptics } from '../../design-system/haptics';
+import { useTranslation } from 'react-i18next';
 import { Text, Avatar, BottomSheet } from '../../components/ui';
 import {
   ChatBubble,
@@ -248,6 +249,7 @@ function AttachOption({
 export function ChatScreen({ navigation, route }: ChatScreenProps<'Chat'>) {
   const { conversationId, name, avatarUrl } = route.params;
   const { colors } = useTheme();
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
 
   // State
@@ -759,16 +761,16 @@ export function ChatScreen({ navigation, route }: ChatScreenProps<'Chat'>) {
 }
 
 // ─── Helper ─────────────────────────────────────────────
-function getPreviewForType(type?: MessageType): string {
+function getPreviewForType(type?: MessageType, t?: (key: string) => string): string {
   switch (type) {
     case 'image':
-      return '📷 Photo';
+      return '📷 ' + (t ? t('chat.photo') : 'Photo');
     case 'video':
-      return '🎬 Video';
+      return '🎬 ' + (t ? t('chat.videoType') : 'Video');
     case 'voice':
-      return '🎤 Voice message';
+      return '🎤 ' + (t ? t('chat.voiceMessage') : 'Voice message');
     case 'file':
-      return '📎 Document';
+      return '📎 ' + (t ? t('chat.document') : 'Document');
     default:
       return '';
   }

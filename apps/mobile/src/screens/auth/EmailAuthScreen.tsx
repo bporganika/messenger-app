@@ -13,6 +13,7 @@ import { useTheme } from '../../design-system';
 import { spacing } from '../../design-system/tokens';
 import { haptics } from '../../design-system/haptics';
 import { Text, Button, Input } from '../../components/ui';
+import { useTranslation } from 'react-i18next';
 import type { AuthScreenProps } from '../../navigation/types';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -20,6 +21,7 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 export function EmailAuthScreen({ navigation }: AuthScreenProps<'EmailAuth'>) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -69,20 +71,20 @@ export function EmailAuthScreen({ navigation }: AuthScreenProps<'EmailAuth'>) {
         {/* Heading */}
         <Animated.View entering={FadeInUp.delay(100).springify()}>
           <Text variant="heading" style={styles.heading}>
-            What's your{'\n'}email address?
+            {t('emailAuth.title')}
           </Text>
           <Text
             variant="bodySm"
             color={colors.textSecondary}
             style={styles.sub}>
-            We'll send you a verification code
+            {t('emailAuth.subtitle')}
           </Text>
         </Animated.View>
 
         {/* Email input */}
         <Animated.View entering={FadeInUp.delay(200).springify()}>
           <Input
-            placeholder="you@example.com"
+            placeholder={t('emailAuth.placeholder')}
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
@@ -97,7 +99,7 @@ export function EmailAuthScreen({ navigation }: AuthScreenProps<'EmailAuth'>) {
         {/* Send */}
         <Animated.View entering={FadeInUp.delay(300).springify()}>
           <Button
-            title="Send Code"
+            title={t('emailAuth.sendCode')}
             variant="primary"
             size="lg"
             disabled={!isValid}

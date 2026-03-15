@@ -23,17 +23,20 @@ import { spacing, radius, avatarSize } from '../../design-system/tokens';
 import { haptics } from '../../design-system/haptics';
 import { Text, Button, Input, BottomSheet } from '../../components/ui';
 import { useAuthStore } from '../../stores/authStore';
+import { useTranslation } from 'react-i18next';
 import type { AuthScreenProps } from '../../navigation/types';
 
 // ─── Constants ──────────────────────────────────────────
-const GENDERS = [
-  { key: 'MALE', label: 'Male' },
-  { key: 'FEMALE', label: 'Female' },
-  { key: 'OTHER', label: 'Other' },
-  { key: 'PREFER_NOT_TO_SAY', label: 'Prefer not to say' },
-] as const;
+const GENDER_KEYS = ['MALE', 'FEMALE', 'OTHER', 'PREFER_NOT_TO_SAY'] as const;
 
-type GenderKey = (typeof GENDERS)[number]['key'];
+type GenderKey = (typeof GENDER_KEYS)[number];
+
+const GENDER_I18N_MAP: Record<GenderKey, string> = {
+  MALE: 'profileSetup.genderMale',
+  FEMALE: 'profileSetup.genderFemale',
+  OTHER: 'profileSetup.genderOther',
+  PREFER_NOT_TO_SAY: 'profileSetup.genderPreferNot',
+};
 
 const USERNAME_DEBOUNCE = 500;
 const STAGGER = 100;
@@ -57,6 +60,7 @@ function AvatarPicker({
   onPress: () => void;
 }) {
   const { colors } = useTheme();
+  const { t } = useTranslation();
   const scale = useSharedValue(1);
 
   const animStyle = useAnimatedStyle(() => ({
@@ -108,7 +112,7 @@ function AvatarPicker({
             variant="caption"
             color={colors.textTertiary}
             style={styles.avatarLabel}>
-            Add photo
+            {t('profileSetup.addPhoto')}
           </Text>
         </View>
       )}
@@ -299,6 +303,7 @@ export function ProfileSetupScreen({
 }: AuthScreenProps<'ProfileSetup'>) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
   const setAuth = useAuthStore((s) => s.setAuth);
 
   // Form state
@@ -428,7 +433,7 @@ export function ProfileSetupScreen({
         {/* Heading */}
         <Animated.View entering={stagger(0)}>
           <Text variant="heading" align="center" style={styles.heading}>
-            Set up your profile
+            {t('profileSetup.title')}
           </Text>
         </Animated.View>
 
@@ -445,8 +450,8 @@ export function ProfileSetupScreen({
         {/* First name */}
         <Animated.View entering={stagger(2)}>
           <Input
-            label="First name"
-            placeholder="John"
+            label={t('profileSetup.firstName')}
+            placeholder={t('profileSetup.firstNamePlaceholder')}
             value={firstName}
             onChangeText={setFirstName}
             autoCapitalize="words"
@@ -458,8 +463,8 @@ export function ProfileSetupScreen({
         {/* Last name */}
         <Animated.View entering={stagger(3)}>
           <Input
-            label="Last name"
-            placeholder="Doe"
+            label={t('profileSetup.lastName')}
+            placeholder={t('profileSetup.lastNamePlaceholder')}
             value={lastName}
             onChangeText={setLastName}
             autoCapitalize="words"
@@ -471,8 +476,8 @@ export function ProfileSetupScreen({
         {/* Username */}
         <Animated.View entering={stagger(4)}>
           <Input
-            label="Username"
-            placeholder="johndoe"
+            label={t('profileSetup.username')}
+            placeholder={t('profileSetup.usernamePlaceholder')}
             value={username}
             onChangeText={handleUsernameChange}
             autoCapitalize="none"
@@ -485,7 +490,7 @@ export function ProfileSetupScreen({
             }
             rightIcon={<UsernameStatusIcon status={usernameStatus} />}
             error={
-              usernameStatus === 'taken' ? 'Username is taken' : undefined
+              usernameStatus === 'taken' ? t('profileSetup.usernameTaken') : undefined
             }
             containerStyle={styles.field}
           />
@@ -494,7 +499,7 @@ export function ProfileSetupScreen({
               variant="caption"
               color={colors.accentSuccess}
               style={styles.usernameHint}>
-              Username is available
+              {t('profileSetup.usernameAvailable')}
             </Text>
           )}
         </Animated.View>
@@ -505,15 +510,15 @@ export function ProfileSetupScreen({
             variant="caption"
             color={colors.textSecondary}
             style={styles.genderLabel}>
-            Gender
+            {t('profileSetup.gender')}
           </Text>
           <View style={styles.genderRow}>
-            {GENDERS.map((g) => (
+            {GENDER_KEYS.map((key) => (
               <GenderChip
-                key={g.key}
-                label={g.label}
-                selected={gender === g.key}
-                onPress={() => setGender(g.key)}
+                key={key}
+                label={t(GENDER_I18N_MAP[key])}
+                selected={gender === key}
+                onPress={() => setGender(key)}
               />
             ))}
           </View>
@@ -524,7 +529,7 @@ export function ProfileSetupScreen({
         {/* Complete */}
         <Animated.View entering={stagger(6)}>
           <Button
-            title="Complete Setup"
+            title={t('profileSetup.complete')}
             variant="primary"
             size="lg"
             disabled={!isComplete}
@@ -540,7 +545,7 @@ export function ProfileSetupScreen({
         onClose={() => setPickerVisible(false)}
         snapPoint={avatarUri ? 0.35 : 0.28}>
         <Text variant="title" style={styles.sheetTitle}>
-          Profile photo
+          {t('profileSetup.profilePhoto')}
         </Text>
 
         <PickerOption
@@ -562,7 +567,7 @@ export function ProfileSetupScreen({
               />
             </Svg>
           }
-          label="Take a photo"
+          label={t('profileSetup.takePhoto')}
           onPress={handlePickFromCamera}
         />
 
@@ -589,7 +594,7 @@ export function ProfileSetupScreen({
               />
             </Svg>
           }
-          label="Choose from gallery"
+          label={t('profileSetup.chooseGallery')}
           onPress={handlePickFromGallery}
         />
 
@@ -606,7 +611,7 @@ export function ProfileSetupScreen({
                 />
               </Svg>
             }
-            label="Remove photo"
+            label={t('profileSetup.removePhoto')}
             color={colors.accentError}
             onPress={handleRemoveAvatar}
           />

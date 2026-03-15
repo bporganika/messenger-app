@@ -13,6 +13,7 @@ import Animated, {
   FadeInUp,
 } from 'react-native-reanimated';
 import Svg, { Path } from 'react-native-svg';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../design-system';
 import { callRingPulse, springs } from '../../design-system/animations';
 import { spacing } from '../../design-system/tokens';
@@ -184,6 +185,7 @@ export function VoiceCallScreen({
   route,
 }: RootScreenProps<'VoiceCall'>) {
   const { callId, userId, name, avatarUrl } = route.params;
+  const { t } = useTranslation();
   const { colors, brand } = useTheme();
   const insets = useSafeAreaInsets();
 
@@ -275,11 +277,11 @@ export function VoiceCallScreen({
 
   const statusLabel =
     status === 'ringing'
-      ? 'Calling...'
+      ? t('voiceCall.calling')
       : status === 'connecting'
-        ? 'Connecting...'
+        ? t('voiceCall.connecting')
         : status === 'ended'
-          ? 'Call ended'
+          ? t('voiceCall.ended')
           : null;
 
   return (
@@ -347,28 +349,28 @@ export function VoiceCallScreen({
         style={styles.controls}>
         <ControlButton
           iconPath={isMuted ? ICON.micOff : ICON.mic}
-          label="Mute"
+          label={t('voiceCall.mute')}
           bg={isMuted ? colors.accentPrimary : colors.surfaceDefault}
           iconColor={isMuted ? '#FFFFFF' : colors.textPrimary}
           onPress={toggleMute}
         />
         <ControlButton
           iconPath={isSpeaker ? ICON.speaker : ICON.speakerOff}
-          label="Speaker"
+          label={t('voiceCall.speaker')}
           bg={isSpeaker ? colors.accentPrimary : colors.surfaceDefault}
           iconColor={isSpeaker ? '#FFFFFF' : colors.textPrimary}
           onPress={toggleSpeaker}
         />
         <ControlButton
           iconPath={ICON.video}
-          label="Video"
+          label={t('voiceCall.video')}
           bg={colors.surfaceDefault}
           iconColor={colors.textPrimary}
           onPress={handleSwitchToVideo}
         />
         <ControlButton
           iconPath={ICON.end}
-          label="End"
+          label={t('voiceCall.end')}
           bg={colors.accentError}
           iconColor="#FFFFFF"
           onPress={handleEndCall}

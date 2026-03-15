@@ -2,18 +2,20 @@ import React from 'react';
 import { View, StyleSheet, Share } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../design-system';
 import { spacing } from '../../design-system/tokens';
 import { Text, Button } from '../../components/ui';
 import type { ContactScreenProps } from '../../navigation/types';
 
 export function InviteScreen({ navigation }: ContactScreenProps<'Invite'>) {
+  const { t } = useTranslation();
   const { colors, brand } = useTheme();
   const insets = useSafeAreaInsets();
 
   const handleShare = async () => {
     await Share.share({
-      message: 'Join me on Pulse Messenger! https://pulse.app/invite/demo',
+      message: t('contacts.shareMessage', { link: 'https://pulse.app/invite/demo' }),
     });
   };
 
@@ -42,20 +44,20 @@ export function InviteScreen({ navigation }: ContactScreenProps<'Invite'>) {
       </View>
 
       <Text variant="heading" align="center" style={styles.title}>
-        Invite friends
+        {t('contacts.inviteFriends')}
       </Text>
       <Text
         variant="body"
         color={colors.textSecondary}
         align="center"
         style={styles.subtitle}>
-        Share your personal link to invite friends to Pulse
+        {t('contacts.inviteSubtitle')}
       </Text>
 
       <View style={styles.spacer} />
 
       <Button
-        title="Share invite link"
+        title={t('contacts.shareLink')}
         variant="primary"
         size="lg"
         onPress={handleShare}

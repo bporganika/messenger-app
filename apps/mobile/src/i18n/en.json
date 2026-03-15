@@ -1,0 +1,234 @@
+{
+  "common": {
+    "save": "Save changes",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "confirm": "Confirm",
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Retry"
+  },
+  "tabs": {
+    "chats": "Chats",
+    "calls": "Calls",
+    "contacts": "Contacts",
+    "settings": "Settings"
+  },
+  "welcome": {
+    "title": "Welcome to",
+    "titleBrand": "Pulse",
+    "subtitle": "Connect with the people\nwho matter most",
+    "continueApple": "Continue with Apple",
+    "continueGoogle": "Continue with Google",
+    "usePhone": "Use phone number",
+    "useEmail": "Use email instead",
+    "terms": "By continuing you agree to our",
+    "termsLink": "Terms",
+    "privacyLink": "Privacy Policy"
+  },
+  "phoneAuth": {
+    "title": "What's your\nphone number?",
+    "subtitle": "We'll send you a code to verify your number",
+    "sendCode": "Send Code",
+    "selectCountry": "Select country",
+    "searchCountry": "Search country or code...",
+    "noCountries": "No countries found"
+  },
+  "emailAuth": {
+    "title": "What's your\nemail address?",
+    "subtitle": "We'll send you a verification code",
+    "placeholder": "you@example.com",
+    "sendCode": "Send Code"
+  },
+  "otp": {
+    "title": "Enter the code",
+    "sentTo": "Sent to {{target}}",
+    "resendIn": "Resend code in {{time}}",
+    "resend": "Resend code"
+  },
+  "profileSetup": {
+    "title": "Set up your profile",
+    "addPhoto": "Add photo",
+    "firstName": "First name",
+    "firstNamePlaceholder": "John",
+    "lastName": "Last name",
+    "lastNamePlaceholder": "Doe",
+    "username": "Username",
+    "usernamePlaceholder": "johndoe",
+    "usernameTaken": "Username is taken",
+    "usernameAvailable": "Username is available",
+    "gender": "Gender",
+    "genderMale": "Male",
+    "genderFemale": "Female",
+    "genderOther": "Other",
+    "genderPreferNot": "Prefer not to say",
+    "complete": "Complete Setup",
+    "profilePhoto": "Profile photo",
+    "takePhoto": "Take a photo",
+    "chooseGallery": "Choose from gallery",
+    "removePhoto": "Remove photo"
+  },
+  "settings": {
+    "title": "Settings",
+    "editProfile": "Edit Profile",
+    "notifications": "Notifications",
+    "privacy": "Privacy",
+    "language": "Language",
+    "appearance": "Appearance",
+    "appLock": "App Lock",
+    "storageData": "Storage & Data",
+    "deleteAccount": "Delete Account",
+    "version": "Pulse v1.0.0",
+    "defaultUser": "User",
+    "defaultUsername": "username"
+  },
+  "editProfile": {
+    "firstName": "First name",
+    "lastName": "Last name",
+    "username": "Username",
+    "usernameTaken": "Username is already taken",
+    "changePhoto": "Change photo",
+    "takePhoto": "Take photo",
+    "chooseGallery": "Choose from gallery",
+    "removePhoto": "Remove photo",
+    "save": "Save changes"
+  },
+  "notifications": {
+    "messagesSection": "MESSAGES",
+    "sound": "Sound",
+    "soundDesc": "Play sound for new messages",
+    "vibration": "Vibration",
+    "vibrationDesc": "Vibrate on new messages",
+    "previews": "Message previews",
+    "previewsDesc": "Show message text in notifications",
+    "quietSection": "QUIET MODE",
+    "muteAll": "Mute all",
+    "muteAllDesc": "Disable sound and vibration"
+  },
+  "privacy": {
+    "section": "WHO CAN SEE MY",
+    "phoneNumber": "Phone number",
+    "lastSeen": "Last seen",
+    "profilePhoto": "Profile photo",
+    "everyone": "Everyone",
+    "contactsOnly": "Contacts only",
+    "nobody": "Nobody",
+    "hint": "Tap each row to cycle through visibility options.\nChanges are saved automatically."
+  },
+  "languageScreen": {
+    "section": "APP LANGUAGE",
+    "hint": "The app will restart to apply the new language",
+    "en": "English",
+    "tr": "Turkish",
+    "de": "German",
+    "fr": "French"
+  },
+  "appearance": {
+    "section": "THEME",
+    "light": "Light",
+    "dark": "Dark",
+    "auto": "Auto",
+    "autoHint": "Theme follows your device settings",
+    "lightHint": "Light theme is always active",
+    "darkHint": "Dark theme is always active"
+  },
+  "appLock": {
+    "biometricSection": "BIOMETRIC",
+    "biometric": "Face ID / Touch ID",
+    "biometricDesc": "Unlock with biometric authentication",
+    "pinSection": "PIN CODE",
+    "pin": "4-digit PIN",
+    "pinSet": "PIN is set",
+    "pinNotSet": "Set a PIN to lock the app",
+    "pinPlaceholder": "Enter 4-digit PIN",
+    "hint": "When enabled, Pulse will ask for authentication every time you open the app.",
+    "biometricFallback": " Biometric will be tried first, with PIN as fallback.",
+    "confirmBiometric": "Confirm to enable biometric lock"
+  },
+  "storage": {
+    "totalCache": "Total cache used",
+    "breakdown": "BREAKDOWN",
+    "images": "Images",
+    "videos": "Videos",
+    "voiceMessages": "Voice messages",
+    "documents": "Documents",
+    "clearCache": "Clear all cache",
+    "clearing": "Clearing...",
+    "clearHint": "Clearing cache will remove locally stored media. Your messages and conversations will not be affected."
+  },
+  "deleteAccountScreen": {
+    "title": "Delete your account?",
+    "consequence1": "All your messages will be permanently removed",
+    "consequence2": "Your contacts and chat history will be erased",
+    "consequence3": "Your username will become available to others",
+    "consequence4": "This action cannot be undone after 30 days",
+    "confirmLabel": "Type <bold>DELETE</bold> to confirm",
+    "confirmPlaceholder": "Type DELETE",
+    "deleteButton": "Delete my account"
+  },
+  "lock": {
+    "title": "Pulse is locked",
+    "enterPin": "Enter your PIN to unlock",
+    "wrongPin": "Wrong PIN",
+    "tooManyAttempts": "Too many attempts. Try again in {{cooldown}}s",
+    "unlockBiometric": "Unlock Pulse"
+  },
+  "voiceCall": {
+    "calling": "Calling...",
+    "connecting": "Connecting...",
+    "ended": "Call ended",
+    "mute": "Mute",
+    "speaker": "Speaker",
+    "video": "Video",
+    "end": "End"
+  },
+  "calls": {
+    "title": "Calls",
+    "incoming": "Incoming",
+    "outgoing": "Outgoing",
+    "missed": "Missed",
+    "voice": "Voice",
+    "videoType": "Video",
+    "noCalls": "No calls yet",
+    "noCallsDesc": "Your call history will appear here"
+  },
+  "videoCall": {
+    "mute": "Mute",
+    "flip": "Flip",
+    "video": "Video",
+    "end": "End",
+    "you": "You"
+  },
+  "chat": {
+    "photo": "Photo",
+    "videoType": "Video",
+    "voiceMessage": "Voice message",
+    "document": "Document",
+    "search": "Search...",
+    "archive": "Archive",
+    "deleteConversation": "Delete conversation",
+    "deleteConversationMsg": "Delete your conversation with {{name}}? This cannot be undone.",
+    "noResults": "No results for \"{{query}}\"",
+    "tryDifferent": "Try a different search term",
+    "noConversations": "No conversations yet",
+    "noConversationsDesc": "Start a chat with someone to begin messaging",
+    "startChat": "Start a chat",
+    "typing": "typing...",
+    "online": "Online",
+    "noMessages": "No messages yet.\nSay hello!",
+    "messagePlaceholder": "Message...",
+    "attach": "Attach",
+    "camera": "Camera",
+    "gallery": "Gallery",
+    "you": "You"
+  },
+  "contacts": {
+    "inviteFriends": "Invite friends",
+    "inviteSubtitle": "Share your personal link to invite friends to Pulse",
+    "shareLink": "Share invite link",
+    "shareMessage": "Join me on Pulse Messenger! {{link}}",
+    "searchPlaceholder": "Search by @username or phone number",
+    "syncContacts": "Sync contacts",
+    "onPulse": "ON PULSE"
+  }
+}

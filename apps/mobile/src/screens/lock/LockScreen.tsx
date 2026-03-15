@@ -11,6 +11,7 @@ import Animated, {
 import Svg, { Path } from 'react-native-svg';
 import ReactNativeBiometrics from 'react-native-biometrics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../design-system';
 import { springs } from '../../design-system/animations';
 import { spacing } from '../../design-system/tokens';
@@ -97,6 +98,7 @@ function NumpadKey({
 
 // ─── Screen ──────────────────────────────────────────────
 export function LockScreen() {
+  const { t } = useTranslation();
   const { colors, brand } = useTheme();
   const insets = useSafeAreaInsets();
 
@@ -124,7 +126,7 @@ export function LockScreen() {
       if (!available) return;
 
       const { success } = await rnBiometrics.simplePrompt({
-        promptMessage: 'Unlock Pulse',
+        promptMessage: t('lock.unlockBiometric'),
       });
       if (success) {
         haptics.success();
@@ -133,7 +135,7 @@ export function LockScreen() {
     } catch {
       // user cancelled or error — stay on lock screen
     }
-  }, [biometricEnabled, unlock]);
+  }, [biometricEnabled, unlock, t]);
 
   useEffect(() => {
     if (!biometricTriggered.current && biometricEnabled) {
@@ -231,7 +233,7 @@ export function LockScreen() {
 
       <View style={styles.titleWrap}>
         <Text variant="heading" align="center">
-          Pulse is locked
+          {t('lock.title')}
         </Text>
       </View>
 
@@ -246,15 +248,15 @@ export function LockScreen() {
       <View style={styles.statusWrap}>
         {locked ? (
           <Text variant="bodySm" color={colors.accentError} align="center">
-            Too many attempts. Try again in {cooldown}s
+            {t('lock.tooManyAttempts', { cooldown })}
           </Text>
         ) : error ? (
           <Text variant="bodySm" color={colors.accentError} align="center">
-            Wrong PIN
+            {t('lock.wrongPin')}
           </Text>
         ) : (
           <Text variant="bodySm" color={colors.textSecondary} align="center">
-            Enter your PIN to unlock
+            {t('lock.enterPin')}
           </Text>
         )}
       </View>

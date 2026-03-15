@@ -21,6 +21,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import Svg, { Path } from 'react-native-svg';
 import Contacts from 'react-native-contacts';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../design-system';
 import { springs } from '../../design-system/animations';
 import { spacing, radius } from '../../design-system/tokens';
@@ -253,6 +254,7 @@ function ItemSeparator() {
 export function ContactsScreen({
   navigation,
 }: ContactScreenProps<'Contacts'>) {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
 
@@ -392,8 +394,8 @@ export function ContactsScreen({
                 />
               </Svg>
             }
-            label="Invite friends"
-            subtitle="Share your personal invite link"
+            label={t('contacts.inviteFriends')}
+            subtitle={t('contacts.inviteSubtitle')}
             onPress={handleInvite}
           />
           <ActionRow
@@ -434,7 +436,7 @@ export function ContactsScreen({
                 </Svg>
               )
             }
-            label={synced ? 'Contacts synced' : 'Sync contacts'}
+            label={synced ? 'Contacts synced' : t('contacts.syncContacts')}
             subtitle={
               synced
                 ? 'Your phone book is synced'
@@ -450,11 +452,11 @@ export function ContactsScreen({
           variant="caption"
           color={colors.textTertiary}
           style={styles.sectionLabel}>
-          ON PULSE
+          {t('contacts.onPulse')}
         </Text>
       </View>
     ),
-    [colors, handleInvite, handleSyncContacts, synced, syncing],
+    [colors, handleInvite, handleSyncContacts, synced, syncing, t],
   );
 
   // ── Render ──
@@ -469,7 +471,7 @@ export function ContactsScreen({
       ]}>
       {/* Header */}
       <Animated.View entering={FadeInUp.springify()} style={styles.header}>
-        <Text variant="displayLg">Contacts</Text>
+        <Text variant="displayLg">{t('tabs.contacts')}</Text>
       </Animated.View>
 
       {/* Search */}
@@ -498,7 +500,7 @@ export function ContactsScreen({
           onChangeText={handleSearch}
           onFocus={() => setSearchFocused(true)}
           onBlur={() => setSearchFocused(false)}
-          placeholder="Search by @username or phone"
+          placeholder={t('contacts.searchPlaceholder')}
           placeholderTextColor={colors.textPlaceholder}
           selectionColor={colors.accentPrimary}
           returnKeyType="search"
@@ -643,7 +645,7 @@ export function ContactsScreen({
                   </Svg>
                 </View>
               }
-              actionTitle="Sync contacts"
+              actionTitle={t('contacts.syncContacts')}
               onAction={handleSyncContacts}
             />
           }

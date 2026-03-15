@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useMemo, useRef } from 'react';
 import { View, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 import Animated, {
   FadeInUp,
   useSharedValue,
@@ -17,6 +18,7 @@ import { useAuthStore } from '../../stores/authStore';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 
 export function EditProfileScreen() {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const user = useAuthStore((s) => s.user);
@@ -107,20 +109,20 @@ export function EditProfileScreen() {
           </Pressable>
           <Pressable onPress={() => { haptics.buttonPress(); setPickerVisible(true); }}>
             <Text variant="bodySm" color={colors.accentPrimary} style={styles.changeLabel}>
-              Change photo
+              {t('editProfile.changePhoto')}
             </Text>
           </Pressable>
         </Animated.View>
 
         <Animated.View entering={FadeInUp.springify().delay(80)}>
-          <Input label="First name" value={firstName} onChangeText={setFirstName} textContentType="givenName" containerStyle={styles.field} />
+          <Input label={t('editProfile.firstName')} value={firstName} onChangeText={setFirstName} textContentType="givenName" containerStyle={styles.field} />
         </Animated.View>
         <Animated.View entering={FadeInUp.springify().delay(160)}>
-          <Input label="Last name" value={lastName} onChangeText={setLastName} textContentType="familyName" containerStyle={styles.field} />
+          <Input label={t('editProfile.lastName')} value={lastName} onChangeText={setLastName} textContentType="familyName" containerStyle={styles.field} />
         </Animated.View>
         <Animated.View entering={FadeInUp.springify().delay(240)}>
           <Input
-            label="Username"
+            label={t('editProfile.username')}
             value={username}
             onChangeText={handleUsernameChange}
             autoCapitalize="none"
@@ -131,14 +133,14 @@ export function EditProfileScreen() {
               : usernameStatus === 'taken' ? <Text variant="caption" color={colors.accentError}>✗</Text>
               : null
             }
-            error={usernameStatus === 'taken' ? 'Username is already taken' : undefined}
+            error={usernameStatus === 'taken' ? t('editProfile.usernameTaken') : undefined}
             containerStyle={styles.field}
           />
         </Animated.View>
 
         <Animated.View entering={FadeInUp.springify().delay(320)}>
           <Button
-            title="Save changes"
+            title={t('editProfile.save')}
             variant="primary"
             size="lg"
             disabled={!hasChanges || !canSave}
@@ -156,12 +158,12 @@ export function EditProfileScreen() {
 
       <BottomSheet visible={pickerVisible} onClose={() => setPickerVisible(false)} snapPoint={avatarUri ? 230 : 180}>
         <View style={styles.pickerContent}>
-          <PickerRow label="Take photo" color={colors.textPrimary} onPress={() => handlePickAvatar('camera')}
+          <PickerRow label={t('editProfile.takePhoto')} color={colors.textPrimary} onPress={() => handlePickAvatar('camera')}
             icon={<Svg width={20} height={20} viewBox="0 0 24 24" fill="none"><Path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" stroke={colors.accentPrimary} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" /><Circle cx="12" cy="13" r="4" stroke={colors.accentPrimary} strokeWidth={1.5} /></Svg>} />
-          <PickerRow label="Choose from gallery" color={colors.textPrimary} onPress={() => handlePickAvatar('gallery')}
+          <PickerRow label={t('editProfile.chooseGallery')} color={colors.textPrimary} onPress={() => handlePickAvatar('gallery')}
             icon={<Svg width={20} height={20} viewBox="0 0 24 24" fill="none"><Path d="M19 3H5a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2V5a2 2 0 00-2-2z" stroke={colors.accentPrimary} strokeWidth={1.5} strokeLinecap="round" /><Path d="M21 15l-5-5L5 21" stroke={colors.accentPrimary} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" /><Circle cx="8.5" cy="8.5" r="1.5" stroke={colors.accentPrimary} strokeWidth={1.5} /></Svg>} />
           {avatarUri && (
-            <PickerRow label="Remove photo" color={colors.accentError} onPress={() => { setPickerVisible(false); setAvatarUri(undefined); }}
+            <PickerRow label={t('editProfile.removePhoto')} color={colors.accentError} onPress={() => { setPickerVisible(false); setAvatarUri(undefined); }}
               icon={<Svg width={20} height={20} viewBox="0 0 24 24" fill="none"><Path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z" stroke={colors.accentError} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" /></Svg>} />
           )}
         </View>

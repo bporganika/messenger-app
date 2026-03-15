@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useTranslation } from 'react-i18next';
 import Svg, { Path, Circle } from 'react-native-svg';
 import { useTheme } from '../design-system';
 import { fontFamily } from '../design-system/typography';
@@ -96,6 +97,7 @@ function ActiveDot({ color }: { color: string }) {
 // ─── Main component ──────────────────────────────────────
 export function MainTabs() {
   const { colors } = useTheme();
+  const { t } = useTranslation();
 
   return (
     <Tab.Navigator
@@ -118,7 +120,7 @@ export function MainTabs() {
         name="ChatsTab"
         component={ChatStack}
         options={{
-          tabBarLabel: 'Chats',
+          tabBarLabel: t('tabs.chats'),
           tabBarIcon: ({ color, focused }) => (
             <ChatsIcon color={color} focused={focused} />
           ),
@@ -128,7 +130,7 @@ export function MainTabs() {
         name="CallsTab"
         component={CallStack}
         options={{
-          tabBarLabel: 'Calls',
+          tabBarLabel: t('tabs.calls'),
           tabBarIcon: ({ color, focused }) => (
             <CallsIcon color={color} focused={focused} />
           ),
@@ -138,7 +140,7 @@ export function MainTabs() {
         name="ContactsTab"
         component={ContactStack}
         options={{
-          tabBarLabel: 'Contacts',
+          tabBarLabel: t('tabs.contacts'),
           tabBarIcon: ({ color, focused }) => (
             <ContactsIcon color={color} focused={focused} />
           ),
@@ -148,7 +150,7 @@ export function MainTabs() {
         name="SettingsTab"
         component={SettingsStack}
         options={{
-          tabBarLabel: 'Settings',
+          tabBarLabel: t('tabs.settings'),
           tabBarIcon: ({ color, focused }) => (
             <SettingsIcon color={color} focused={focused} />
           ),

@@ -1,0 +1,234 @@
+{
+  "common": {
+    "save": "Änderungen speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "confirm": "Bestätigen",
+    "loading": "Laden...",
+    "error": "Etwas ist schiefgelaufen",
+    "retry": "Erneut versuchen"
+  },
+  "tabs": {
+    "chats": "Chats",
+    "calls": "Anrufe",
+    "contacts": "Kontakte",
+    "settings": "Einstellungen"
+  },
+  "welcome": {
+    "title": "Willkommen bei",
+    "titleBrand": "Pulse",
+    "subtitle": "Bleib verbunden mit\nden Menschen, die zählen",
+    "continueApple": "Mit Apple fortfahren",
+    "continueGoogle": "Mit Google fortfahren",
+    "usePhone": "Telefonnummer verwenden",
+    "useEmail": "E-Mail verwenden",
+    "terms": "Durch Fortfahren stimmen Sie unseren",
+    "termsLink": "Nutzungsbedingungen",
+    "privacyLink": "Datenschutzrichtlinie"
+  },
+  "phoneAuth": {
+    "title": "Wie lautet Ihre\nTelefonnummer?",
+    "subtitle": "Wir senden Ihnen einen Bestätigungscode",
+    "sendCode": "Code senden",
+    "selectCountry": "Land auswählen",
+    "searchCountry": "Land oder Vorwahl suchen...",
+    "noCountries": "Keine Länder gefunden"
+  },
+  "emailAuth": {
+    "title": "Wie lautet Ihre\nE-Mail-Adresse?",
+    "subtitle": "Wir senden Ihnen einen Bestätigungscode",
+    "placeholder": "sie@beispiel.de",
+    "sendCode": "Code senden"
+  },
+  "otp": {
+    "title": "Code eingeben",
+    "sentTo": "Gesendet an {{target}}",
+    "resendIn": "Code erneut senden in {{time}}",
+    "resend": "Code erneut senden"
+  },
+  "profileSetup": {
+    "title": "Profil einrichten",
+    "addPhoto": "Foto hinzufügen",
+    "firstName": "Vorname",
+    "firstNamePlaceholder": "Max",
+    "lastName": "Nachname",
+    "lastNamePlaceholder": "Müller",
+    "username": "Benutzername",
+    "usernamePlaceholder": "maxmueller",
+    "usernameTaken": "Benutzername ist vergeben",
+    "usernameAvailable": "Benutzername ist verfügbar",
+    "gender": "Geschlecht",
+    "genderMale": "Männlich",
+    "genderFemale": "Weiblich",
+    "genderOther": "Andere",
+    "genderPreferNot": "Keine Angabe",
+    "complete": "Einrichtung abschließen",
+    "profilePhoto": "Profilfoto",
+    "takePhoto": "Foto aufnehmen",
+    "chooseGallery": "Aus Galerie wählen",
+    "removePhoto": "Foto entfernen"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "editProfile": "Profil bearbeiten",
+    "notifications": "Benachrichtigungen",
+    "privacy": "Datenschutz",
+    "language": "Sprache",
+    "appearance": "Erscheinungsbild",
+    "appLock": "App-Sperre",
+    "storageData": "Speicher & Daten",
+    "deleteAccount": "Konto löschen",
+    "version": "Pulse v1.0.0",
+    "defaultUser": "Benutzer",
+    "defaultUsername": "benutzername"
+  },
+  "editProfile": {
+    "firstName": "Vorname",
+    "lastName": "Nachname",
+    "username": "Benutzername",
+    "usernameTaken": "Benutzername ist bereits vergeben",
+    "changePhoto": "Foto ändern",
+    "takePhoto": "Foto aufnehmen",
+    "chooseGallery": "Aus Galerie wählen",
+    "removePhoto": "Foto entfernen",
+    "save": "Änderungen speichern"
+  },
+  "notifications": {
+    "messagesSection": "NACHRICHTEN",
+    "sound": "Ton",
+    "soundDesc": "Ton bei neuen Nachrichten abspielen",
+    "vibration": "Vibration",
+    "vibrationDesc": "Bei neuen Nachrichten vibrieren",
+    "previews": "Nachrichtenvorschau",
+    "previewsDesc": "Nachrichtentext in Benachrichtigungen anzeigen",
+    "quietSection": "RUHEMODUS",
+    "muteAll": "Alle stummschalten",
+    "muteAllDesc": "Ton und Vibration deaktivieren"
+  },
+  "privacy": {
+    "section": "WER KANN SEHEN",
+    "phoneNumber": "Telefonnummer",
+    "lastSeen": "Zuletzt online",
+    "profilePhoto": "Profilfoto",
+    "everyone": "Jeder",
+    "contactsOnly": "Nur Kontakte",
+    "nobody": "Niemand",
+    "hint": "Tippen Sie auf jede Zeile, um die Sichtbarkeit zu ändern.\nÄnderungen werden automatisch gespeichert."
+  },
+  "languageScreen": {
+    "section": "APP-SPRACHE",
+    "hint": "Die App wird neu gestartet, um die neue Sprache anzuwenden",
+    "en": "Englisch",
+    "tr": "Türkisch",
+    "de": "Deutsch",
+    "fr": "Französisch"
+  },
+  "appearance": {
+    "section": "DESIGN",
+    "light": "Hell",
+    "dark": "Dunkel",
+    "auto": "Automatisch",
+    "autoHint": "Design folgt Ihren Geräteeinstellungen",
+    "lightHint": "Helles Design ist immer aktiv",
+    "darkHint": "Dunkles Design ist immer aktiv"
+  },
+  "appLock": {
+    "biometricSection": "BIOMETRIE",
+    "biometric": "Face ID / Touch ID",
+    "biometricDesc": "Mit biometrischer Authentifizierung entsperren",
+    "pinSection": "PIN-CODE",
+    "pin": "4-stellige PIN",
+    "pinSet": "PIN ist eingerichtet",
+    "pinNotSet": "PIN einrichten, um die App zu sperren",
+    "pinPlaceholder": "4-stellige PIN eingeben",
+    "hint": "Wenn aktiviert, verlangt Pulse bei jedem Öffnen der App eine Authentifizierung.",
+    "biometricFallback": " Biometrie wird zuerst versucht, PIN als Ausweichmöglichkeit.",
+    "confirmBiometric": "Bestätigen Sie die biometrische Sperre"
+  },
+  "storage": {
+    "totalCache": "Genutzter Cache-Speicher",
+    "breakdown": "AUFSCHLÜSSELUNG",
+    "images": "Bilder",
+    "videos": "Videos",
+    "voiceMessages": "Sprachnachrichten",
+    "documents": "Dokumente",
+    "clearCache": "Gesamten Cache löschen",
+    "clearing": "Wird gelöscht...",
+    "clearHint": "Das Löschen des Caches entfernt lokal gespeicherte Medien. Ihre Nachrichten und Konversationen sind davon nicht betroffen."
+  },
+  "deleteAccountScreen": {
+    "title": "Konto löschen?",
+    "consequence1": "Alle Ihre Nachrichten werden dauerhaft entfernt",
+    "consequence2": "Ihre Kontakte und der Chatverlauf werden gelöscht",
+    "consequence3": "Ihr Benutzername wird für andere verfügbar",
+    "consequence4": "Diese Aktion kann nach 30 Tagen nicht rückgängig gemacht werden",
+    "confirmLabel": "Geben Sie <bold>LÖSCHEN</bold> zur Bestätigung ein",
+    "confirmPlaceholder": "LÖSCHEN eingeben",
+    "deleteButton": "Mein Konto löschen"
+  },
+  "lock": {
+    "title": "Pulse ist gesperrt",
+    "enterPin": "Geben Sie Ihre PIN ein",
+    "wrongPin": "Falsche PIN",
+    "tooManyAttempts": "Zu viele Versuche. Versuchen Sie es in {{cooldown}}s erneut",
+    "unlockBiometric": "Pulse entsperren"
+  },
+  "voiceCall": {
+    "calling": "Anruf...",
+    "connecting": "Verbinde...",
+    "ended": "Anruf beendet",
+    "mute": "Stumm",
+    "speaker": "Lautsprecher",
+    "video": "Video",
+    "end": "Beenden"
+  },
+  "calls": {
+    "incoming": "Eingehend",
+    "outgoing": "Ausgehend",
+    "missed": "Verpasst",
+    "voice": "Sprache",
+    "videoType": "Video",
+    "title": "Anrufe",
+    "noCalls": "Noch keine Anrufe",
+    "noCallsDesc": "Ihr Anrufverlauf wird hier angezeigt"
+  },
+  "videoCall": {
+    "mute": "Stumm",
+    "flip": "Drehen",
+    "video": "Video",
+    "end": "Beenden",
+    "you": "Du"
+  },
+  "chat": {
+    "photo": "Foto",
+    "videoType": "Video",
+    "voiceMessage": "Sprachnachricht",
+    "document": "Dokument",
+    "search": "Suchen...",
+    "archive": "Archivieren",
+    "deleteConversation": "Unterhaltung löschen",
+    "deleteConversationMsg": "Unterhaltung mit {{name}} löschen? Dies kann nicht rückgängig gemacht werden.",
+    "noResults": "Keine Ergebnisse für \"{{query}}\"",
+    "tryDifferent": "Versuchen Sie einen anderen Suchbegriff",
+    "noConversations": "Noch keine Unterhaltungen",
+    "noConversationsDesc": "Starten Sie einen Chat, um mit dem Schreiben zu beginnen",
+    "startChat": "Chat starten",
+    "typing": "tippt...",
+    "online": "Online",
+    "noMessages": "Noch keine Nachrichten.\nSagen Sie Hallo!",
+    "messagePlaceholder": "Nachricht...",
+    "attach": "Anhängen",
+    "camera": "Kamera",
+    "gallery": "Galerie",
+    "you": "Du"
+  },
+  "contacts": {
+    "inviteFriends": "Freunde einladen",
+    "inviteSubtitle": "Teilen Sie Ihren persönlichen Link, um Freunde zu Pulse einzuladen",
+    "shareLink": "Einladungslink teilen",
+    "shareMessage": "Tritt Pulse Messenger bei! {{link}}",
+    "searchPlaceholder": "Nach @Benutzername oder Telefonnummer suchen",
+    "syncContacts": "Kontakte synchronisieren",
+    "onPulse": "AUF PULSE"
+  }
+}
