@@ -8,7 +8,9 @@ import { ThemeProvider, useTheme } from './design-system';
 import { RootNavigator } from './navigation/RootNavigator';
 import { LockScreen } from './screens/lock/LockScreen';
 import { useAppLockStore } from './stores/appLockStore';
+import { navigationRef } from './services/navigationRef';
 import * as CallKeepService from './services/callkeep';
+import * as PushService from './services/push';
 
 function AppLockGuard() {
   const isLocked = useAppLockStore((s) => s.isLocked);
@@ -52,10 +54,11 @@ function AppContent() {
 
   useEffect(() => {
     CallKeepService.setup();
+    PushService.setup();
   }, []);
 
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <StatusBar
         barStyle={isDark ? 'light-content' : 'dark-content'}
         translucent

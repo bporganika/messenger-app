@@ -1,5 +1,6 @@
 import { Server, Socket } from 'socket.io';
 import { prisma } from '../../utils/prisma';
+import { sendMessageNotification } from '../../services/push.service';
 
 export function messageHandler(io: Server, socket: Socket) {
   const userId = socket.data['userId'] as string;
@@ -35,6 +36,23 @@ export function messageHandler(io: Server, socket: Socket) {
       });
 
       io.to(`conversation:${data.conversationId}`).emit('message:new', message);
+
+      // Send push notification to offline conversation members
+      const members = await prisma.conversationMember.findMany({
+        where: { conversationId: data.conversationId, userId: { not: userId } },
+        select: { userId: true },
+      });
+
+      for (const member of members) {
+        sendMessageNotification(member.userId, {
+          type: 'message',
+          conversationId: data.conversationId,
+          senderName: message.sender.firstName,
+          senderAvatar: message.sender.avatarUrl ?? undefined,
+          content: data.content ?? '',
+          messageType: message.type,
+        }).catch(() => {});
+      }
     } catch (error) {
       socket.emit('error', { message: 'Failed to send message' });
     }

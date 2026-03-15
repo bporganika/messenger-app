@@ -1,6 +1,7 @@
 import { Server, Socket } from 'socket.io';
 import { prisma } from '../../utils/prisma';
 import { getOnlineUsers } from '../index';
+import { sendCallNotification } from '../../services/push.service';
 
 // ─── Types ───────────────────────────────────────────────────
 interface ActiveCall {
@@ -179,8 +180,19 @@ export function callSignalingHandler(io: Server, socket: Socket) {
             type: data.type,
             caller: caller as Record<string, unknown>,
           });
+        } else {
+          // Callee offline → VoIP push (iOS) / high-priority FCM (Android)
+          sendCallNotification(data.calleeId, {
+            type: 'call',
+            callId: call.id,
+            callerId: userId,
+            callerName: caller
+              ? `${caller.firstName} ${caller.lastName}`
+              : 'Unknown',
+            callerAvatar: (caller?.avatarUrl as string) ?? undefined,
+            callType: data.type === 'VIDEO' ? 'video' : 'voice',
+          }).catch(() => {});
         }
-        // TODO: send VoIP push (APNs/FCM) if callee is offline
 
         ack?.({ callId: call.id });
       } catch {
