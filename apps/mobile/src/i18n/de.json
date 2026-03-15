@@ -162,7 +162,7 @@
     "consequence2": "Ihre Kontakte und der Chatverlauf werden gelöscht",
     "consequence3": "Ihr Benutzername wird für andere verfügbar",
     "consequence4": "Diese Aktion kann nach 30 Tagen nicht rückgängig gemacht werden",
-    "confirmLabel": "Geben Sie <bold>LÖSCHEN</bold> zur Bestätigung ein",
+    "confirmLabel": "Geben Sie {{word}} zur Bestätigung ein",
     "confirmPlaceholder": "LÖSCHEN eingeben",
     "deleteButton": "Mein Konto löschen"
   },
@@ -220,7 +220,8 @@
     "attach": "Anhängen",
     "camera": "Kamera",
     "gallery": "Galerie",
-    "you": "Du"
+    "you": "Du",
+    "today": "Heute"
   },
   "contacts": {
     "inviteFriends": "Freunde einladen",
@@ -229,6 +230,21 @@
     "shareMessage": "Tritt Pulse Messenger bei! {{link}}",
     "searchPlaceholder": "Nach @Benutzername oder Telefonnummer suchen",
     "syncContacts": "Kontakte synchronisieren",
+    "contactsSynced": "Kontakte synchronisiert",
+    "phoneSynced": "Ihr Telefonbuch ist synchronisiert",
+    "findFromPhoneBook": "Freunde aus dem Telefonbuch finden",
+    "searching": "Suche...",
+    "noResultsFor": "Keine Ergebnisse für \"{{query}}\"",
+    "tryDifferentContact": "Versuchen Sie einen anderen Benutzernamen oder Telefonnummer",
+    "findFriends": "Freunde finden",
+    "findFriendsDesc": "Synchronisieren Sie Ihre Kontakte oder suchen Sie nach Benutzernamen, um Personen auf Pulse zu finden",
     "onPulse": "AUF PULSE"
+  },
+  "userProfile": {
+    "chat": "Chat",
+    "call": "Anrufen",
+    "video": "Video",
+    "blockUser": "Benutzer blockieren",
+    "reportUser": "Benutzer melden"
   }
 }

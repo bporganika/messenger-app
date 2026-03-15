@@ -16,6 +16,7 @@ import Animated, {
   FadeInUp,
 } from 'react-native-reanimated';
 import Svg, { Path } from 'react-native-svg';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../design-system';
 import { springs } from '../../design-system/animations';
 import { spacing, radius } from '../../design-system/tokens';
@@ -214,14 +215,16 @@ function CallRow({
   const nameColor = isMissed ? colors.accentError : colors.textPrimary;
   const dirColor = isMissed ? colors.accentError : colors.accentSuccess;
 
+  const { t } = useTranslation();
+
   const directionLabel =
     item.direction === 'incoming'
-      ? 'Incoming'
+      ? t('calls.incoming')
       : item.direction === 'outgoing'
-        ? 'Outgoing'
-        : 'Missed';
+        ? t('calls.outgoing')
+        : t('calls.missed');
 
-  const typeLabel = item.callType === 'voice' ? 'Voice' : 'Video';
+  const typeLabel = item.callType === 'voice' ? t('calls.voice') : t('calls.videoType');
 
   return (
     <AnimatedPressable
@@ -289,6 +292,7 @@ function ItemSeparator() {
 
 // ─── Screen ─────────────────────────────────────────────
 export function CallHistoryScreen() {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const rootNav =
@@ -364,7 +368,7 @@ export function CallHistoryScreen() {
       ]}>
       {/* Header */}
       <Animated.View entering={FadeInUp.springify()} style={styles.header}>
-        <Text variant="displayLg">Calls</Text>
+        <Text variant="displayLg">{t('calls.title')}</Text>
       </Animated.View>
 
       {/* List */}
@@ -387,8 +391,8 @@ export function CallHistoryScreen() {
         }
         ListEmptyComponent={
           <EmptyState
-            title="No calls yet"
-            description="Your call history will appear here"
+            title={t('calls.noCalls')}
+            description={t('calls.noCallsDesc')}
             icon={
               <View
                 style={[

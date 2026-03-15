@@ -3,6 +3,7 @@ import { View, StyleSheet, Pressable, Dimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import FastImage from 'react-native-fast-image';
 import Svg, { Path } from 'react-native-svg';
+import { useTranslation } from 'react-i18next';
 import { haptics } from '../../design-system/haptics';
 import { spacing } from '../../design-system/tokens';
 import { Text } from '../../components/ui';
@@ -15,6 +16,7 @@ export function MediaViewerScreen({
   route,
 }: ChatScreenProps<'MediaViewer'>) {
   const { uri, type } = route.params;
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
 
   return (
@@ -47,7 +49,7 @@ export function MediaViewerScreen({
       ) : (
         <View style={styles.videoPlaceholder}>
           <Text variant="body" color="#FFFFFF" align="center">
-            Video player
+            {t('videoCall.video')}
           </Text>
         </View>
       )}

@@ -7,6 +7,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import Svg, { Path, Rect } from 'react-native-svg';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../design-system';
 import { spacing, radius } from '../../design-system/tokens';
 import { haptics } from '../../design-system/haptics';
@@ -20,14 +21,15 @@ interface StorageItem {
 }
 
 export function StorageScreen() {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const [clearing, setClearing] = useState(false);
 
   const items: StorageItem[] = [
-    { label: 'Images', size: '24.3 MB', bytes: 24300000, color: colors.accentPrimary },
-    { label: 'Videos', size: '48.1 MB', bytes: 48100000, color: colors.accentSecondary },
-    { label: 'Voice messages', size: '8.7 MB', bytes: 8700000, color: colors.accentSuccess },
-    { label: 'Documents', size: '5.2 MB', bytes: 5200000, color: colors.accentWarning },
+    { label: t('storage.images'), size: '24.3 MB', bytes: 24300000, color: colors.accentPrimary },
+    { label: t('storage.videos'), size: '48.1 MB', bytes: 48100000, color: colors.accentSecondary },
+    { label: t('storage.voiceMessages'), size: '8.7 MB', bytes: 8700000, color: colors.accentSuccess },
+    { label: t('storage.documents'), size: '5.2 MB', bytes: 5200000, color: colors.accentWarning },
   ];
 
   const totalBytes = items.reduce((sum, i) => sum + i.bytes, 0);
@@ -53,13 +55,13 @@ export function StorageScreen() {
           </Svg>
         </View>
         <Text variant="displayLg">{totalSize}</Text>
-        <Text variant="bodySm" color={colors.textSecondary}>Total cache used</Text>
+        <Text variant="bodySm" color={colors.textSecondary}>{t('storage.totalCache')}</Text>
       </Animated.View>
 
       {/* Breakdown */}
       <Animated.View entering={FadeInUp.springify().delay(80)}>
         <Text variant="caption" color={colors.textTertiary} style={styles.sectionLabel}>
-          BREAKDOWN
+          {t('storage.breakdown')}
         </Text>
         <View style={[styles.section, { backgroundColor: colors.surfaceDefault, borderColor: colors.borderDefault }]}>
           {items.map((item, i) => (
@@ -81,7 +83,7 @@ export function StorageScreen() {
       {/* Clear button */}
       <Animated.View entering={FadeInUp.springify().delay(160)}>
         <Button
-          title={clearing ? 'Clearing...' : 'Clear all cache'}
+          title={clearing ? t('storage.clearing') : t('storage.clearCache')}
           variant="secondary"
           size="lg"
           loading={clearing}
@@ -92,8 +94,7 @@ export function StorageScreen() {
 
       <Animated.View entering={FadeInUp.springify().delay(200)}>
         <Text variant="caption" color={colors.textTertiary} style={styles.hint}>
-          Clearing cache will remove locally stored media.
-          Your messages and conversations will not be affected.
+          {t('storage.clearHint')}
         </Text>
       </Animated.View>
     </View>

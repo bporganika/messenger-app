@@ -10,6 +10,7 @@ import Animated, {
   Easing,
 } from 'react-native-reanimated';
 import Svg, { Path } from 'react-native-svg';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../design-system';
 import { spacing, radius } from '../../design-system/tokens';
 import { haptics } from '../../design-system/haptics';
@@ -18,14 +19,15 @@ import { useAuthStore } from '../../stores/authStore';
 
 const CONFIRM_WORD = 'DELETE';
 
-const CONSEQUENCES = [
-  'All your messages will be permanently removed',
-  'Your contacts and chat history will be erased',
-  'Your username will become available to others',
-  'This action cannot be undone after 30 days',
-];
+const CONSEQUENCE_KEYS = [
+  'deleteAccountScreen.consequence1',
+  'deleteAccountScreen.consequence2',
+  'deleteAccountScreen.consequence3',
+  'deleteAccountScreen.consequence4',
+] as const;
 
 export function DeleteAccountScreen() {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const logout = useAuthStore((s) => s.logout);
@@ -87,17 +89,17 @@ export function DeleteAccountScreen() {
       {/* Title */}
       <Animated.View entering={FadeInUp.springify().delay(80)}>
         <Text variant="heading" align="center" style={styles.title}>
-          Delete your account?
+          {t('deleteAccountScreen.title')}
         </Text>
       </Animated.View>
 
       {/* Consequences */}
       <Animated.View entering={FadeInUp.springify().delay(160)} style={styles.consequencesWrap}>
-        {CONSEQUENCES.map((text) => (
-          <View key={text} style={styles.consequenceRow}>
+        {CONSEQUENCE_KEYS.map((key) => (
+          <View key={key} style={styles.consequenceRow}>
             <View style={[styles.bullet, { backgroundColor: colors.accentError }]} />
             <Text variant="bodySm" color={colors.textSecondary} style={styles.consequenceText}>
-              {text}
+              {t(key)}
             </Text>
           </View>
         ))}
@@ -106,7 +108,19 @@ export function DeleteAccountScreen() {
       {/* Confirmation input */}
       <Animated.View entering={FadeInUp.springify().delay(240)}>
         <Text variant="bodySm" color={colors.textSecondary} style={styles.confirmLabel}>
-          Type <Text variant="bodySm" color={colors.accentError} style={{ fontWeight: '700' }}>DELETE</Text> to confirm
+          {t('deleteAccountScreen.confirmLabel', { word: CONFIRM_WORD })
+            .split(CONFIRM_WORD)
+            .reduce<React.ReactNode[]>((acc, part, i, arr) => {
+              acc.push(part);
+              if (i < arr.length - 1) {
+                acc.push(
+                  <Text key={i} variant="bodySm" color={colors.accentError} style={{ fontWeight: '700' }}>
+                    {CONFIRM_WORD}
+                  </Text>,
+                );
+              }
+              return acc;
+            }, [])}
         </Text>
         <View
           style={[
@@ -119,7 +133,7 @@ export function DeleteAccountScreen() {
           <TextInput
             value={confirmation}
             onChangeText={setConfirmation}
-            placeholder="Type DELETE"
+            placeholder={t('deleteAccountScreen.confirmPlaceholder')}
             placeholderTextColor={colors.textPlaceholder}
             autoCapitalize="characters"
             autoCorrect={false}
@@ -133,7 +147,7 @@ export function DeleteAccountScreen() {
       {/* Delete button */}
       <Animated.View entering={FadeInUp.springify().delay(320)}>
         <Button
-          title="Delete my account"
+          title={t('deleteAccountScreen.deleteButton')}
           variant="danger"
           size="lg"
           disabled={!isConfirmed}

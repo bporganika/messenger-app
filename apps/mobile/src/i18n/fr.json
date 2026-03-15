@@ -162,7 +162,7 @@
     "consequence2": "Vos contacts et l'historique des discussions seront effacés",
     "consequence3": "Votre nom d'utilisateur sera disponible pour d'autres",
     "consequence4": "Cette action ne peut pas être annulée après 30 jours",
-    "confirmLabel": "Tapez <bold>SUPPRIMER</bold> pour confirmer",
+    "confirmLabel": "Tapez {{word}} pour confirmer",
     "confirmPlaceholder": "Tapez SUPPRIMER",
     "deleteButton": "Supprimer mon compte"
   },
@@ -220,7 +220,8 @@
     "attach": "Joindre",
     "camera": "Appareil photo",
     "gallery": "Galerie",
-    "you": "Vous"
+    "you": "Vous",
+    "today": "Aujourd'hui"
   },
   "contacts": {
     "inviteFriends": "Inviter des amis",
@@ -229,6 +230,21 @@
     "shareMessage": "Rejoins-moi sur Pulse Messenger ! {{link}}",
     "searchPlaceholder": "Rechercher par @nom d'utilisateur ou numéro",
     "syncContacts": "Synchroniser les contacts",
+    "contactsSynced": "Contacts synchronisés",
+    "phoneSynced": "Votre répertoire est synchronisé",
+    "findFromPhoneBook": "Trouvez des amis depuis votre répertoire",
+    "searching": "Recherche...",
+    "noResultsFor": "Aucun résultat pour \"{{query}}\"",
+    "tryDifferentContact": "Essayez un autre nom d'utilisateur ou numéro de téléphone",
+    "findFriends": "Trouver des amis",
+    "findFriendsDesc": "Synchronisez vos contacts ou recherchez par nom d'utilisateur pour trouver des personnes sur Pulse",
     "onPulse": "SUR PULSE"
+  },
+  "userProfile": {
+    "chat": "Discussion",
+    "call": "Appeler",
+    "video": "Vidéo",
+    "blockUser": "Bloquer l'utilisateur",
+    "reportUser": "Signaler l'utilisateur"
   }
 }

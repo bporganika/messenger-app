@@ -37,7 +37,7 @@ export function LanguageScreen() {
   const handleSelect = useCallback((code: string) => {
     haptics.buttonPress();
     setSelected(code);
-    changeLanguage(code);
+    changeLanguage(code as 'en' | 'tr' | 'de' | 'fr');
     // TODO: PATCH /api/v1/users/me { language: code }
   }, []);
 

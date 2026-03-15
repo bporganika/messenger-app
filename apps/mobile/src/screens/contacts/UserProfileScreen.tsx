@@ -2,6 +2,7 @@ import React from 'react';
 import { View, StyleSheet, ScrollView, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../design-system';
 import { spacing, radius } from '../../design-system/tokens';
 import { haptics } from '../../design-system/haptics';
@@ -41,6 +42,7 @@ export function UserProfileScreen({
   route,
 }: ContactScreenProps<'UserProfile'>) {
   const { name, avatarUrl } = route.params;
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
 
@@ -95,7 +97,7 @@ export function UserProfileScreen({
               />
             </Svg>
           }
-          label="Chat"
+          label={t('userProfile.chat')}
           onPress={() => {
             // TODO: find or create conversation, navigate to Chat
           }}
@@ -112,7 +114,7 @@ export function UserProfileScreen({
               />
             </Svg>
           }
-          label="Call"
+          label={t('userProfile.call')}
           onPress={() => {}}
         />
         <ActionCircle
@@ -127,7 +129,7 @@ export function UserProfileScreen({
               />
             </Svg>
           }
-          label="Video"
+          label={t('userProfile.video')}
           onPress={() => {}}
         />
       </View>
@@ -151,7 +153,7 @@ export function UserProfileScreen({
           />
         </Svg>
         <Text variant="body" color={colors.accentError}>
-          Block user
+          {t('userProfile.blockUser')}
         </Text>
       </Pressable>
 
@@ -171,7 +173,7 @@ export function UserProfileScreen({
           />
         </Svg>
         <Text variant="body" color={colors.accentWarning}>
-          Report user
+          {t('userProfile.reportUser')}
         </Text>
       </Pressable>
     </ScrollView>

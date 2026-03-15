@@ -3,6 +3,7 @@ import { View, StyleSheet, TextInput } from 'react-native';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import Svg, { Path, Rect } from 'react-native-svg';
 import ReactNativeBiometrics from 'react-native-biometrics';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../design-system';
 import { spacing, radius } from '../../design-system/tokens';
 import { haptics } from '../../design-system/haptics';
@@ -12,6 +13,7 @@ import { useAppLockStore } from '../../stores/appLockStore';
 const rnBiometrics = new ReactNativeBiometrics();
 
 export function AppLockScreen() {
+  const { t } = useTranslation();
   const { colors } = useTheme();
 
   const pinEnabled = useAppLockStore((s) => s.pinEnabled);
@@ -31,7 +33,7 @@ export function AppLockScreen() {
           const { available } = await rnBiometrics.isSensorAvailable();
           if (!available) return;
           const { success } = await rnBiometrics.simplePrompt({
-            promptMessage: 'Confirm to enable biometric lock',
+            promptMessage: t('appLock.confirmBiometric'),
           });
           if (success) {
             setBiometric(true);
@@ -116,7 +118,7 @@ export function AppLockScreen() {
           variant="caption"
           color={colors.textTertiary}
           style={styles.sectionLabel}>
-          BIOMETRIC
+          {t('appLock.biometricSection')}
         </Text>
         <View
           style={[
@@ -138,9 +140,9 @@ export function AppLockScreen() {
               </Svg>
             </View>
             <View style={styles.rowText}>
-              <Text variant="body">Face ID / Touch ID</Text>
+              <Text variant="body">{t('appLock.biometric')}</Text>
               <Text variant="caption" color={colors.textTertiary}>
-                Unlock with biometric authentication
+                {t('appLock.biometricDesc')}
               </Text>
             </View>
             <Switch value={biometricEnabled} onValueChange={handleBiometric} />
@@ -154,7 +156,7 @@ export function AppLockScreen() {
           variant="caption"
           color={colors.textTertiary}
           style={styles.sectionLabel}>
-          PIN CODE
+          {t('appLock.pinSection')}
         </Text>
         <View
           style={[
@@ -185,9 +187,9 @@ export function AppLockScreen() {
               </Svg>
             </View>
             <View style={styles.rowText}>
-              <Text variant="body">4-digit PIN</Text>
+              <Text variant="body">{t('appLock.pin')}</Text>
               <Text variant="caption" color={colors.textTertiary}>
-                {pinEnabled ? 'PIN is set' : 'Set a PIN to lock the app'}
+                {pinEnabled ? t('appLock.pinSet') : t('appLock.pinNotSet')}
               </Text>
             </View>
             <Switch value={pinEnabled} onValueChange={handlePinToggle} />
@@ -202,7 +204,7 @@ export function AppLockScreen() {
                 secureTextEntry
                 value={pinValue}
                 onChangeText={handlePinChange}
-                placeholder="Enter 4-digit PIN"
+                placeholder={t('appLock.pinPlaceholder')}
                 placeholderTextColor={colors.textPlaceholder}
                 style={[
                   styles.pinInput,
@@ -223,10 +225,9 @@ export function AppLockScreen() {
           variant="caption"
           color={colors.textTertiary}
           style={styles.hint}>
-          When enabled, Pulse will ask for authentication every time you open the
-          app.
+          {t('appLock.hint')}
           {biometricEnabled && pinEnabled
-            ? ' Biometric will be tried first, with PIN as fallback.'
+            ? t('appLock.biometricFallback')
             : ''}
         </Text>
       </Animated.View>

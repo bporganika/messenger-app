@@ -290,8 +290,8 @@ export function ChatScreen({ navigation, route }: ChatScreenProps<'Chat'>) {
       }),
       status: 'sending',
       replyToId: replyTo?.id,
-      replyToSender: replyTo ? (replyTo.isSent ? 'You' : name) : undefined,
-      replyToText: replyTo?.text ?? getPreviewForType(replyTo?.type),
+      replyToSender: replyTo ? (replyTo.isSent ? t('chat.you') : name) : undefined,
+      replyToText: replyTo?.text ?? getPreviewForType(replyTo?.type, t),
     };
 
     setMessages((prev) => [newMsg, ...prev]);
@@ -444,7 +444,7 @@ export function ChatScreen({ navigation, route }: ChatScreenProps<'Chat'>) {
 
     // Add date separator at the end (top of list)
     if (messages.length > 0) {
-      items.push({ type: 'date', label: 'Today' });
+      items.push({ type: 'date', label: t('chat.today') });
     }
 
     return items;
@@ -542,11 +542,11 @@ export function ChatScreen({ navigation, route }: ChatScreenProps<'Chat'>) {
             </Text>
             {isTyping ? (
               <Text variant="caption" color={colors.accentPrimary}>
-                typing...
+                {t('chat.typing')}
               </Text>
             ) : (
               <Text variant="caption" color={colors.accentSuccess}>
-                Online
+                {t('chat.online')}
               </Text>
             )}
           </View>
@@ -609,7 +609,7 @@ export function ChatScreen({ navigation, route }: ChatScreenProps<'Chat'>) {
           loadingOlder ? (
             <View style={styles.loadingOlder}>
               <Text variant="caption" color={colors.textTertiary}>
-                Loading...
+                {t('common.loading')}
               </Text>
             </View>
           ) : null
@@ -630,7 +630,7 @@ export function ChatScreen({ navigation, route }: ChatScreenProps<'Chat'>) {
               color={colors.textTertiary}
               align="center"
               style={styles.emptyText}>
-              No messages yet.{'\n'}Say hello!
+              {t('chat.noMessages')}
             </Text>
           </View>
         }
@@ -640,9 +640,9 @@ export function ChatScreen({ navigation, route }: ChatScreenProps<'Chat'>) {
       {replyTo && (
         <Animated.View entering={FadeIn.duration(150)} exiting={FadeOut.duration(100)}>
           <ReplyPreview
-            senderName={replyTo.isSent ? 'You' : name}
+            senderName={replyTo.isSent ? t('chat.you') : name}
             messageText={
-              replyTo.text ?? getPreviewForType(replyTo.type)
+              replyTo.text ?? getPreviewForType(replyTo.type, t)
             }
             onDismiss={dismissReply}
           />
@@ -670,7 +670,7 @@ export function ChatScreen({ navigation, route }: ChatScreenProps<'Chat'>) {
           onAttach={() => setAttachVisible((v) => !v)}
           onMicPressIn={startRecording}
           attachOpen={attachVisible}
-          placeholder="Message..."
+          placeholder={t('chat.messagePlaceholder')}
         />
       )}
 
@@ -680,7 +680,7 @@ export function ChatScreen({ navigation, route }: ChatScreenProps<'Chat'>) {
         onClose={() => setAttachVisible(false)}
         snapPoint={0.3}>
         <Text variant="title" style={styles.attachTitle}>
-          Attach
+          {t('chat.attach')}
         </Text>
 
         <AttachOption
@@ -702,7 +702,7 @@ export function ChatScreen({ navigation, route }: ChatScreenProps<'Chat'>) {
               />
             </Svg>
           }
-          label="Camera"
+          label={t('chat.camera')}
           onPress={handleAttachCamera}
         />
 
@@ -729,7 +729,7 @@ export function ChatScreen({ navigation, route }: ChatScreenProps<'Chat'>) {
               />
             </Svg>
           }
-          label="Gallery"
+          label={t('chat.gallery')}
           onPress={handleAttachGallery}
         />
 
@@ -752,7 +752,7 @@ export function ChatScreen({ navigation, route }: ChatScreenProps<'Chat'>) {
               />
             </Svg>
           }
-          label="Document"
+          label={t('chat.document')}
           onPress={handleAttachDocument}
         />
       </BottomSheet>

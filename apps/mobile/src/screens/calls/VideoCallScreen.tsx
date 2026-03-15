@@ -2,6 +2,7 @@ import React from 'react';
 import { View, StyleSheet, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
+import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../design-system';
 import { spacing } from '../../design-system/tokens';
 import { haptics } from '../../design-system/haptics';
@@ -13,6 +14,7 @@ export function VideoCallScreen({
   route,
 }: RootScreenProps<'VideoCall'>) {
   const { name } = route.params;
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
 
@@ -49,7 +51,7 @@ export function VideoCallScreen({
       {/* Placeholder for remote video */}
       <View style={styles.remoteVideo}>
         <Text variant="body" color="rgba(255,255,255,0.5)" align="center">
-          Video stream
+          {t('videoCall.video')}
         </Text>
       </View>
 
@@ -57,16 +59,20 @@ export function VideoCallScreen({
       <View
         style={[styles.localPip, { top: insets.top + 80 }]}>
         <Text variant="caption" color="rgba(255,255,255,0.7)">
-          You
+          {t('videoCall.you')}
         </Text>
       </View>
 
       {/* Controls */}
       <View
         style={[styles.controls, { paddingBottom: insets.bottom + spacing['24'] }]}>
-        {['Mute', 'Flip', 'Video'].map((label) => (
+        {([
+          { key: 'mute', label: t('videoCall.mute') },
+          { key: 'flip', label: t('videoCall.flip') },
+          { key: 'video', label: t('videoCall.video') },
+        ] as const).map((item) => (
           <Pressable
-            key={label}
+            key={item.key}
             onPress={() => haptics.buttonPress()}
             style={styles.ctrlBtn}>
             <View
@@ -75,11 +81,11 @@ export function VideoCallScreen({
                 { backgroundColor: 'rgba(255,255,255,0.15)' },
               ]}>
               <Text variant="caption" color="#FFFFFF">
-                {label[0]}
+                {item.label[0]}
               </Text>
             </View>
             <Text variant="caption" color="rgba(255,255,255,0.8)">
-              {label}
+              {item.label}
             </Text>
           </Pressable>
         ))}
@@ -101,7 +107,7 @@ export function VideoCallScreen({
             </Svg>
           </View>
           <Text variant="caption" color="rgba(255,255,255,0.8)">
-            End
+            {t('videoCall.end')}
           </Text>
         </Pressable>
       </View>

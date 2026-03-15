@@ -162,7 +162,7 @@
     "consequence2": "Kişileriniz ve sohbet geçmişiniz silinecek",
     "consequence3": "Kullanıcı adınız başkaları için kullanılabilir olacak",
     "consequence4": "Bu işlem 30 gün sonra geri alınamaz",
-    "confirmLabel": "Onaylamak için <bold>SİL</bold> yazın",
+    "confirmLabel": "Onaylamak için {{word}} yazın",
     "confirmPlaceholder": "SİL yazın",
     "deleteButton": "Hesabımı sil"
   },
@@ -220,7 +220,8 @@
     "attach": "Ekle",
     "camera": "Kamera",
     "gallery": "Galeri",
-    "you": "Siz"
+    "you": "Siz",
+    "today": "Bugün"
   },
   "contacts": {
     "inviteFriends": "Arkadaşlarını davet et",
@@ -229,6 +230,21 @@
     "shareMessage": "Pulse Messenger'a katıl! {{link}}",
     "searchPlaceholder": "@kullanıcı adı veya telefon numarası ile ara",
     "syncContacts": "Kişileri senkronize et",
+    "contactsSynced": "Kişiler senkronize edildi",
+    "phoneSynced": "Telefon rehberiniz senkronize edildi",
+    "findFromPhoneBook": "Telefon rehberinizden arkadaş bulun",
+    "searching": "Aranıyor...",
+    "noResultsFor": "\"{{query}}\" için sonuç bulunamadı",
+    "tryDifferentContact": "Farklı bir kullanıcı adı veya telefon numarası deneyin",
+    "findFriends": "Arkadaş bul",
+    "findFriendsDesc": "Pulse'daki kişileri bulmak için kişilerinizi senkronize edin veya kullanıcı adına göre arayın",
     "onPulse": "PULSE'DA"
+  },
+  "userProfile": {
+    "chat": "Sohbet",
+    "call": "Ara",
+    "video": "Video",
+    "blockUser": "Kullanıcıyı engelle",
+    "reportUser": "Kullanıcıyı şikayet et"
   }
 }

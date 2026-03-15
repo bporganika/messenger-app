@@ -436,11 +436,11 @@ export function ContactsScreen({
                 </Svg>
               )
             }
-            label={synced ? 'Contacts synced' : t('contacts.syncContacts')}
+            label={synced ? t('contacts.contactsSynced') : t('contacts.syncContacts')}
             subtitle={
               synced
-                ? 'Your phone book is synced'
-                : 'Find friends from your phone book'
+                ? t('contacts.phoneSynced')
+                : t('contacts.findFromPhoneBook')
             }
             onPress={handleSyncContacts}
             loading={syncing}
@@ -558,7 +558,7 @@ export function ContactsScreen({
             searching ? (
               <View style={styles.searchingWrap}>
                 <Text variant="body" color={colors.textTertiary}>
-                  Searching...
+                  {t('contacts.searching')}
                 </Text>
               </View>
             ) : (
@@ -581,13 +581,13 @@ export function ContactsScreen({
                   color={colors.textTertiary}
                   align="center"
                   style={styles.noResultsText}>
-                  No results for &ldquo;{search}&rdquo;
+                  {t('contacts.noResultsFor', { query: search })}
                 </Text>
                 <Text
                   variant="bodySm"
                   color={colors.textTertiary}
                   align="center">
-                  Try a different username or phone number
+                  {t('contacts.tryDifferentContact')}
                 </Text>
               </View>
             )
@@ -622,8 +622,8 @@ export function ContactsScreen({
           }
           ListEmptyComponent={
             <EmptyState
-              title="Find friends"
-              description="Sync your contacts or search by username to find people on Pulse"
+              title={t('contacts.findFriends')}
+              description={t('contacts.findFriendsDesc')}
               icon={
                 <View
                   style={[

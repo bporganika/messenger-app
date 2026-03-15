@@ -162,7 +162,7 @@
     "consequence2": "Your contacts and chat history will be erased",
     "consequence3": "Your username will become available to others",
     "consequence4": "This action cannot be undone after 30 days",
-    "confirmLabel": "Type <bold>DELETE</bold> to confirm",
+    "confirmLabel": "Type {{word}} to confirm",
     "confirmPlaceholder": "Type DELETE",
     "deleteButton": "Delete my account"
   },
@@ -220,7 +220,8 @@
     "attach": "Attach",
     "camera": "Camera",
     "gallery": "Gallery",
-    "you": "You"
+    "you": "You",
+    "today": "Today"
   },
   "contacts": {
     "inviteFriends": "Invite friends",
@@ -229,6 +230,21 @@
     "shareMessage": "Join me on Pulse Messenger! {{link}}",
     "searchPlaceholder": "Search by @username or phone number",
     "syncContacts": "Sync contacts",
+    "contactsSynced": "Contacts synced",
+    "phoneSynced": "Your phone book is synced",
+    "findFromPhoneBook": "Find friends from your phone book",
+    "searching": "Searching...",
+    "noResultsFor": "No results for \"{{query}}\"",
+    "tryDifferentContact": "Try a different username or phone number",
+    "findFriends": "Find friends",
+    "findFriendsDesc": "Sync your contacts or search by username to find people on Pulse",
     "onPulse": "ON PULSE"
+  },
+  "userProfile": {
+    "chat": "Chat",
+    "call": "Call",
+    "video": "Video",
+    "blockUser": "Block user",
+    "reportUser": "Report user"
   }
 }

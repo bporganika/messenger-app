@@ -130,7 +130,7 @@ function ThemeCard({
           variant="bodySm"
           align="center"
           color={isSelected ? colors.accentPrimary : colors.textPrimary}>
-          {option.label}
+          {t(option.labelKey)}
         </Text>
 
         {isSelected && (
