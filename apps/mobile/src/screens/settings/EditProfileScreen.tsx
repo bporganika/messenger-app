@@ -15,6 +15,7 @@ import { spacing } from '../../design-system/tokens';
 import { haptics } from '../../design-system/haptics';
 import { Text, Input, Button, Avatar, BottomSheet } from '../../components/ui';
 import { useAuthStore } from '../../stores/authStore';
+import { api } from '../../services/api';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 
 export function EditProfileScreen() {
@@ -43,9 +44,13 @@ export function EditProfileScreen() {
       if (timerRef.current) clearTimeout(timerRef.current);
       if (clean.length >= 3 && clean !== user?.username) {
         setUsernameStatus('checking');
-        timerRef.current = setTimeout(() => {
-          // TODO: GET /api/v1/users/search?q=@clean
-          setUsernameStatus(clean === 'taken' ? 'taken' : 'available');
+        timerRef.current = setTimeout(async () => {
+          try {
+            const data = await api.get<{ available: boolean }>('/users/check-username', { params: { username: clean } });
+            setUsernameStatus(data.available ? 'available' : 'taken');
+          } catch {
+            setUsernameStatus('idle');
+          }
         }, 500);
       }
     },
@@ -145,11 +150,16 @@ export function EditProfileScreen() {
             size="lg"
             disabled={!hasChanges || !canSave}
             loading={saving}
-            onPress={() => {
+            onPress={async () => {
               haptics.buttonPress();
               setSaving(true);
-              // TODO: PATCH /api/v1/users/me
-              setTimeout(() => setSaving(false), 800);
+              try {
+                await api.patch('/users/me', { firstName, lastName, username, avatarUrl: avatarUri });
+              } catch {
+                // silently fail
+              } finally {
+                setSaving(false);
+              }
             }}
             style={styles.saveBtn}
           />

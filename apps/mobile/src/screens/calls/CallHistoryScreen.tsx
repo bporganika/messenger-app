@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import {
   View,
   StyleSheet,
@@ -22,6 +22,7 @@ import { springs } from '../../design-system/animations';
 import { spacing, radius } from '../../design-system/tokens';
 import { haptics } from '../../design-system/haptics';
 import { Text, Avatar, EmptyState } from '../../components/ui';
+import { api } from '../../services/api';
 import type { RootStackParamList } from '../../navigation/types';
 
 // ─── Types ──────────────────────────────────────────────
@@ -38,71 +39,6 @@ interface CallEntry {
   timestamp: string;
   duration?: string;
 }
-
-// ─── Demo data ──────────────────────────────────────────
-const DEMO_CALLS: CallEntry[] = [
-  {
-    id: '1',
-    userId: 'u1',
-    name: 'John Doe',
-    direction: 'incoming',
-    callType: 'voice',
-    timestamp: 'Today, 14:30',
-    duration: '5:23',
-  },
-  {
-    id: '2',
-    userId: 'u2',
-    name: 'Anna Smith',
-    direction: 'outgoing',
-    callType: 'video',
-    timestamp: 'Today, 12:15',
-    duration: '12:07',
-  },
-  {
-    id: '3',
-    userId: 'u3',
-    name: 'Ali Yılmaz',
-    direction: 'missed',
-    callType: 'voice',
-    timestamp: 'Yesterday, 18:00',
-  },
-  {
-    id: '4',
-    userId: 'u4',
-    name: 'Maria García',
-    direction: 'outgoing',
-    callType: 'voice',
-    timestamp: 'Yesterday, 09:15',
-    duration: '2:41',
-  },
-  {
-    id: '5',
-    userId: 'u1',
-    name: 'John Doe',
-    direction: 'missed',
-    callType: 'video',
-    timestamp: 'Mar 10, 20:45',
-  },
-  {
-    id: '6',
-    userId: 'u5',
-    name: 'David Chen',
-    direction: 'incoming',
-    callType: 'video',
-    timestamp: 'Mar 10, 16:30',
-    duration: '8:12',
-  },
-  {
-    id: '7',
-    userId: 'u2',
-    name: 'Anna Smith',
-    direction: 'outgoing',
-    callType: 'voice',
-    timestamp: 'Mar 9, 11:00',
-    duration: '0:45',
-  },
-];
 
 // ─── Direction icon ─────────────────────────────────────
 function DirectionIcon({
@@ -298,14 +234,33 @@ export function CallHistoryScreen() {
   const rootNav =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
-  const [calls, setCalls] = useState<CallEntry[]>(DEMO_CALLS);
+  const [calls, setCalls] = useState<CallEntry[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
-  const handleRefresh = useCallback(() => {
+  const loadCalls = useCallback(async () => {
+    try {
+      const data = await api.get<{ calls: CallEntry[] }>('/calls/history');
+      setCalls(data.calls);
+    } catch {
+      // silently fail on load
+    }
+  }, []);
+
+  useEffect(() => {
+    loadCalls();
+  }, [loadCalls]);
+
+  const handleRefresh = useCallback(async () => {
     setRefreshing(true);
     haptics.pullToRefresh();
-    // TODO: GET /api/v1/calls/history
-    setTimeout(() => setRefreshing(false), 1000);
+    try {
+      const data = await api.get<{ calls: CallEntry[] }>('/calls/history');
+      setCalls(data.calls);
+    } catch {
+      // silently fail on refresh
+    } finally {
+      setRefreshing(false);
+    }
   }, []);
 
   const handleCall = useCallback(

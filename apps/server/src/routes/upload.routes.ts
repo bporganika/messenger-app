@@ -1,6 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { authenticate } from '../middleware/auth';
 import { badRequest, sendError } from '../utils/errors';
+import { uploadToS3 } from '../utils/s3';
 
 const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100 MB
 
@@ -38,8 +39,10 @@ export async function uploadRoutes(fastify: FastifyInstance) {
         chunks.push(chunk);
       }
 
-      // TODO: upload buffer to S3 and get URL
-      const url = `/uploads/${Date.now()}-${file.filename}`;
+      const buffer = Buffer.concat(chunks);
+      const key = `uploads/${Date.now()}-${file.filename}`;
+
+      const url = await uploadToS3(buffer, key, file.mimetype);
 
       return reply.status(201).send({
         url,

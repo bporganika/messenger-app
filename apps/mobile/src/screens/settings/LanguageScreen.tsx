@@ -14,6 +14,7 @@ import { spacing, radius } from '../../design-system/tokens';
 import { haptics } from '../../design-system/haptics';
 import { Text, Divider } from '../../components/ui';
 import { changeLanguage, getCurrentLanguage } from '../../i18n';
+import { api } from '../../services/api';
 
 interface Language {
   code: string;
@@ -38,7 +39,7 @@ export function LanguageScreen() {
     haptics.buttonPress();
     setSelected(code);
     changeLanguage(code as 'en' | 'tr' | 'de' | 'fr');
-    // TODO: PATCH /api/v1/users/me { language: code }
+    api.patch('/users/me', { language: code });
   }, []);
 
   return (

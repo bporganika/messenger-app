@@ -1,254 +1,32 @@
-import React, { useState, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useCallback, useMemo, useRef, useEffect } from 'react';
 import {
   View,
   StyleSheet,
   FlatList,
-  TextInput,
-  Pressable,
   RefreshControl,
   Platform,
   Linking,
-  Share,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-  FadeInUp,
-  FadeIn,
-  FadeOut,
-} from 'react-native-reanimated';
+import Animated, { FadeInUp } from 'react-native-reanimated';
 import Svg, { Path } from 'react-native-svg';
 import Contacts from 'react-native-contacts';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../design-system';
-import { springs } from '../../design-system/animations';
-import { spacing, radius } from '../../design-system/tokens';
-import { fontFamily, typography } from '../../design-system/typography';
+import { spacing } from '../../design-system/tokens';
 import { haptics } from '../../design-system/haptics';
-import { Text, Avatar, EmptyState } from '../../components/ui';
+import { Text, EmptyState } from '../../components/ui';
+import {
+  ContactSearchBar,
+  ContactsListHeader,
+  ContactRow,
+  SearchResultRow,
+  SearchEmptyState,
+  ItemSeparator,
+} from '../../components/contacts';
+import type { PulseContact, SearchResult } from '../../components/contacts';
+import { api } from '../../services/api';
 import type { ContactScreenProps } from '../../navigation/types';
-
-// ─── Types ──────────────────────────────────────────────
-type OnlineStatus = 'online' | 'offline' | 'away';
-
-interface PulseContact {
-  id: string;
-  name: string;
-  username: string;
-  avatarUrl?: string;
-  onlineStatus: OnlineStatus;
-  phone?: string;
-}
-
-interface SearchResult {
-  id: string;
-  name: string;
-  username: string;
-  avatarUrl?: string;
-}
-
-// ─── Demo data ──────────────────────────────────────────
-const DEMO_CONTACTS: PulseContact[] = [
-  {
-    id: 'u1',
-    name: 'John Doe',
-    username: 'johndoe',
-    onlineStatus: 'online',
-  },
-  {
-    id: 'u2',
-    name: 'Anna Smith',
-    username: 'annasmith',
-    onlineStatus: 'offline',
-  },
-  {
-    id: 'u3',
-    name: 'Ali Yılmaz',
-    username: 'aliyilmaz',
-    onlineStatus: 'online',
-  },
-  {
-    id: 'u4',
-    name: 'Maria García',
-    username: 'mariagarcia',
-    onlineStatus: 'away',
-  },
-  {
-    id: 'u5',
-    name: 'David Chen',
-    username: 'davidchen',
-    onlineStatus: 'offline',
-  },
-];
-
-// ─── Action row ─────────────────────────────────────────
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-
-function ActionRow({
-  icon,
-  label,
-  subtitle,
-  onPress,
-  loading,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  subtitle?: string;
-  onPress: () => void;
-  loading?: boolean;
-}) {
-  const { colors } = useTheme();
-  const scale = useSharedValue(1);
-
-  const animStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
-
-  const handlePressIn = useCallback(() => {
-    scale.value = withSpring(0.98, springs.snappy);
-  }, [scale]);
-
-  const handlePressOut = useCallback(() => {
-    scale.value = withSpring(1, springs.snappy);
-  }, [scale]);
-
-  return (
-    <AnimatedPressable
-      onPress={() => {
-        haptics.buttonPress();
-        onPress();
-      }}
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
-      style={[
-        styles.actionRow,
-        {
-          backgroundColor: colors.surfaceDefault,
-          borderColor: colors.borderDefault,
-        },
-        animStyle,
-      ]}>
-      <View
-        style={[
-          styles.actionIcon,
-          { backgroundColor: colors.accentPrimary + '1A' },
-        ]}>
-        {icon}
-      </View>
-      <View style={styles.actionTextWrap}>
-        <Text variant="body" style={styles.actionLabel}>
-          {label}
-        </Text>
-        {subtitle && (
-          <Text variant="caption" color={colors.textTertiary}>
-            {subtitle}
-          </Text>
-        )}
-      </View>
-      <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
-        <Path
-          d="M9 18l6-6-6-6"
-          stroke={colors.textTertiary}
-          strokeWidth={1.5}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </Svg>
-    </AnimatedPressable>
-  );
-}
-
-// ─── Contact row ────────────────────────────────────────
-function ContactRow({
-  contact,
-  onPress,
-}: {
-  contact: PulseContact;
-  onPress: () => void;
-}) {
-  const { colors } = useTheme();
-  const scale = useSharedValue(1);
-
-  const animStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
-
-  const handlePressIn = useCallback(() => {
-    scale.value = withSpring(0.98, springs.snappy);
-  }, [scale]);
-
-  const handlePressOut = useCallback(() => {
-    scale.value = withSpring(1, springs.snappy);
-  }, [scale]);
-
-  return (
-    <AnimatedPressable
-      onPress={() => {
-        haptics.buttonPress();
-        onPress();
-      }}
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
-      style={[styles.contactRow, animStyle]}>
-      <Avatar
-        uri={contact.avatarUrl}
-        name={contact.name}
-        size="md"
-        status={contact.onlineStatus}
-      />
-      <View style={styles.contactInfo}>
-        <Text variant="bodyLg" numberOfLines={1} style={styles.contactName}>
-          {contact.name}
-        </Text>
-        <Text variant="bodySm" color={colors.textSecondary} numberOfLines={1}>
-          @{contact.username}
-        </Text>
-      </View>
-    </AnimatedPressable>
-  );
-}
-
-// ─── Search result row ──────────────────────────────────
-function SearchResultRow({
-  result,
-  onPress,
-}: {
-  result: SearchResult;
-  onPress: () => void;
-}) {
-  const { colors } = useTheme();
-
-  return (
-    <Pressable
-      onPress={() => {
-        haptics.buttonPress();
-        onPress();
-      }}
-      style={styles.contactRow}>
-      <Avatar uri={result.avatarUrl} name={result.name} size="md" />
-      <View style={styles.contactInfo}>
-        <Text variant="bodyLg" numberOfLines={1} style={styles.contactName}>
-          {result.name}
-        </Text>
-        <Text variant="bodySm" color={colors.textSecondary} numberOfLines={1}>
-          @{result.username}
-        </Text>
-      </View>
-    </Pressable>
-  );
-}
-
-// ─── Separator ──────────────────────────────────────────
-function ItemSeparator() {
-  const { colors } = useTheme();
-  return (
-    <View
-      style={[styles.separator, { backgroundColor: colors.separator }]}
-    />
-  );
-}
 
 // ─── Screen ─────────────────────────────────────────────
 export function ContactsScreen({
@@ -260,7 +38,7 @@ export function ContactsScreen({
 
   const [search, setSearch] = useState('');
   const [searchFocused, setSearchFocused] = useState(false);
-  const [contacts, setContacts] = useState<PulseContact[]>(DEMO_CONTACTS);
+  const [contacts, setContacts] = useState<PulseContact[]>([]);
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [searching, setSearching] = useState(false);
   const [syncing, setSyncing] = useState(false);
@@ -282,23 +60,15 @@ export function ContactsScreen({
     }
 
     setSearching(true);
-    debounceRef.current = setTimeout(() => {
-      // TODO: call GET /api/v1/users/search?q={text}
-      // Simulate API search
-      const q = text.toLowerCase().replace('@', '');
-      const results: SearchResult[] = DEMO_CONTACTS.filter(
-        (c) =>
-          c.username.includes(q) ||
-          c.name.toLowerCase().includes(q) ||
-          (c.phone && c.phone.includes(text)),
-      ).map((c) => ({
-        id: c.id,
-        name: c.name,
-        username: c.username,
-        avatarUrl: c.avatarUrl,
-      }));
-      setSearchResults(results);
-      setSearching(false);
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const data = await api.get<{ users: SearchResult[] }>('/users/search', { params: { q: text } });
+        setSearchResults(data.users);
+      } catch {
+        setSearchResults([]);
+      } finally {
+        setSearching(false);
+      }
     }, 500);
   }, []);
 
@@ -308,36 +78,26 @@ export function ContactsScreen({
     setSyncing(true);
 
     try {
-      // Request permission
       const permission = await Contacts.requestPermission();
       if (permission !== 'authorized') {
         setSyncing(false);
-        // TODO: show toast — "Contacts permission denied"
-        // Offer to open settings
         if (Platform.OS === 'ios') {
           Linking.openSettings();
         }
         return;
       }
 
-      // Get all device contacts
       const deviceContacts = await Contacts.getAll();
-
-      // Extract phone numbers
       const phones = deviceContacts
         .flatMap((c) => c.phoneNumbers.map((p) => p.number))
         .filter(Boolean);
 
-      // TODO: call POST /api/v1/contacts/sync { phones }
-      // For now simulate: mark as synced
-      setTimeout(() => {
-        setSyncing(false);
-        setSynced(true);
-        haptics.success();
-      }, 800);
+      await api.post('/contacts/sync', { phones });
+      setSyncing(false);
+      setSynced(true);
+      haptics.success();
     } catch {
       setSyncing(false);
-      // TODO: show error toast
     }
   }, [syncing]);
 
@@ -358,105 +118,54 @@ export function ContactsScreen({
     [navigation],
   );
 
-  // ── Refresh ──
-  const handleRefresh = useCallback(() => {
-    setRefreshing(true);
-    haptics.pullToRefresh();
-    // TODO: GET /api/v1/contacts
-    setTimeout(() => setRefreshing(false), 1000);
+  // ── Load contacts ──
+  const loadContacts = useCallback(async () => {
+    try {
+      const data = await api.get<{ contacts: PulseContact[] }>('/contacts');
+      setContacts(data.contacts);
+    } catch {
+      // silently fail on load
+    }
   }, []);
 
-  // ── Filtered contacts (local filter) ──
+  useEffect(() => {
+    loadContacts();
+  }, [loadContacts]);
+
+  // ── Refresh ──
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    haptics.pullToRefresh();
+    try {
+      const data = await api.get<{ contacts: PulseContact[] }>('/contacts');
+      setContacts(data.contacts);
+    } catch {
+      // silently fail on refresh
+    } finally {
+      setRefreshing(false);
+    }
+  }, []);
+
+  // ── Search clear ──
+  const handleClearSearch = useCallback(() => {
+    setSearch('');
+    setSearchResults([]);
+  }, []);
+
+  // ── Derived state ──
   const isSearching = search.trim().length > 0;
 
-  // ── List header (actions + section title) ──
+  // ── List header (memoised) ──
   const ListHeader = useMemo(
     () => (
-      <View>
-        {/* Actions */}
-        <View style={styles.actions}>
-          <ActionRow
-            icon={
-              <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
-                <Path
-                  d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"
-                  stroke={colors.accentPrimary}
-                  strokeWidth={1.5}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <Path
-                  d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"
-                  stroke={colors.accentPrimary}
-                  strokeWidth={1.5}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </Svg>
-            }
-            label={t('contacts.inviteFriends')}
-            subtitle={t('contacts.inviteSubtitle')}
-            onPress={handleInvite}
-          />
-          <ActionRow
-            icon={
-              synced ? (
-                <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
-                  <Path
-                    d="M20 6L9 17l-5-5"
-                    stroke={colors.accentSuccess}
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </Svg>
-              ) : (
-                <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
-                  <Path
-                    d="M17 1l4 4-4 4"
-                    stroke={colors.accentPrimary}
-                    strokeWidth={1.5}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <Path
-                    d="M3 11V9a4 4 0 014-4h14M7 23l-4-4 4-4"
-                    stroke={colors.accentPrimary}
-                    strokeWidth={1.5}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <Path
-                    d="M21 13v2a4 4 0 01-4 4H3"
-                    stroke={colors.accentPrimary}
-                    strokeWidth={1.5}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </Svg>
-              )
-            }
-            label={synced ? t('contacts.contactsSynced') : t('contacts.syncContacts')}
-            subtitle={
-              synced
-                ? t('contacts.phoneSynced')
-                : t('contacts.findFromPhoneBook')
-            }
-            onPress={handleSyncContacts}
-            loading={syncing}
-          />
-        </View>
-
-        {/* Section header */}
-        <Text
-          variant="caption"
-          color={colors.textTertiary}
-          style={styles.sectionLabel}>
-          {t('contacts.onPulse')}
-        </Text>
-      </View>
+      <ContactsListHeader
+        synced={synced}
+        syncing={syncing}
+        onInvite={handleInvite}
+        onSyncContacts={handleSyncContacts}
+      />
     ),
-    [colors, handleInvite, handleSyncContacts, synced, syncing, t],
+    [synced, syncing, handleInvite, handleSyncContacts],
   );
 
   // ── Render ──
@@ -475,65 +184,14 @@ export function ContactsScreen({
       </Animated.View>
 
       {/* Search */}
-      <Animated.View
-        entering={FadeInUp.delay(80).springify()}
-        style={[
-          styles.searchBar,
-          {
-            backgroundColor: colors.surfaceDefault,
-            borderColor: searchFocused
-              ? colors.borderFocus
-              : colors.borderDefault,
-          },
-        ]}>
-        <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
-          <Path
-            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            stroke={colors.textTertiary}
-            strokeWidth={1.5}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </Svg>
-        <TextInput
-          value={search}
-          onChangeText={handleSearch}
-          onFocus={() => setSearchFocused(true)}
-          onBlur={() => setSearchFocused(false)}
-          placeholder={t('contacts.searchPlaceholder')}
-          placeholderTextColor={colors.textPlaceholder}
-          selectionColor={colors.accentPrimary}
-          returnKeyType="search"
-          autoCapitalize="none"
-          autoCorrect={false}
-          style={[
-            styles.searchInput,
-            {
-              color: colors.textPrimary,
-              fontFamily: fontFamily.regular,
-              fontSize: typography.bodySm.fontSize,
-            },
-          ]}
-        />
-        {search.length > 0 && (
-          <Pressable
-            onPress={() => {
-              haptics.buttonPress();
-              setSearch('');
-              setSearchResults([]);
-            }}
-            hitSlop={8}>
-            <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
-              <Path
-                d="M18 6L6 18M6 6l12 12"
-                stroke={colors.textTertiary}
-                strokeWidth={2}
-                strokeLinecap="round"
-              />
-            </Svg>
-          </Pressable>
-        )}
-      </Animated.View>
+      <ContactSearchBar
+        value={search}
+        focused={searchFocused}
+        onChangeText={handleSearch}
+        onFocus={() => setSearchFocused(true)}
+        onBlur={() => setSearchFocused(false)}
+        onClear={handleClearSearch}
+      />
 
       {/* ── Search results mode ── */}
       {isSearching ? (
@@ -555,42 +213,7 @@ export function ContactsScreen({
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
-            searching ? (
-              <View style={styles.searchingWrap}>
-                <Text variant="body" color={colors.textTertiary}>
-                  {t('contacts.searching')}
-                </Text>
-              </View>
-            ) : (
-              <View style={styles.noResults}>
-                <Svg
-                  width={40}
-                  height={40}
-                  viewBox="0 0 24 24"
-                  fill="none">
-                  <Path
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    stroke={colors.textTertiary}
-                    strokeWidth={1.5}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </Svg>
-                <Text
-                  variant="body"
-                  color={colors.textTertiary}
-                  align="center"
-                  style={styles.noResultsText}>
-                  {t('contacts.noResultsFor', { query: search })}
-                </Text>
-                <Text
-                  variant="bodySm"
-                  color={colors.textTertiary}
-                  align="center">
-                  {t('contacts.tryDifferentContact')}
-                </Text>
-              </View>
-            )
+            <SearchEmptyState query={search} searching={searching} />
           }
         />
       ) : (
@@ -664,112 +287,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing['24'],
     marginBottom: spacing['12'],
   },
-
-  // Search
-  searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginHorizontal: spacing['16'],
-    marginBottom: spacing['16'],
-    paddingHorizontal: spacing['12'],
-    height: 40,
-    borderRadius: radius.full,
-    borderWidth: 1,
-    gap: spacing['8'],
-  },
-  searchInput: {
-    flex: 1,
-    height: '100%',
-    padding: 0,
-    includeFontPadding: false,
-  },
-
-  // Actions
-  actions: {
-    paddingHorizontal: spacing['16'],
-    gap: spacing['8'],
-    marginBottom: spacing['20'],
-  },
-  actionRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: spacing['16'],
-    paddingVertical: spacing['12'],
-    borderRadius: radius.md,
-    borderWidth: 1,
-    gap: spacing['12'],
-  },
-  actionIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  actionTextWrap: {
-    flex: 1,
-  },
-  actionLabel: {
-    fontWeight: '600',
-  },
-
-  // Section
-  sectionLabel: {
-    paddingHorizontal: spacing['24'],
-    marginBottom: spacing['8'],
-    letterSpacing: 1,
-  },
-
-  // Contact row
-  contactRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: spacing['16'],
-    paddingVertical: spacing['12'],
-  },
-  contactInfo: {
-    flex: 1,
-    marginLeft: spacing['12'],
-  },
-  contactName: {
-    fontWeight: '600',
-    marginBottom: spacing['2'],
-  },
-
-  // Separator
-  separator: {
-    height: StyleSheet.hairlineWidth,
-    marginLeft: spacing['16'] + 44 + spacing['12'],
-  },
-
-  // List
   list: {
     paddingBottom: spacing['16'],
   },
   emptyContainer: {
     flex: 1,
   },
-
-  // Search states
-  searchingWrap: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingTop: spacing['48'],
-  },
-  noResults: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: spacing['32'],
-    paddingTop: spacing['48'],
-    gap: spacing['8'],
-  },
-  noResultsText: {
-    marginTop: spacing['8'],
-  },
-
-  // Empty
   emptyIcon: {
     width: 64,
     height: 64,

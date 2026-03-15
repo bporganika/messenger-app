@@ -1,9 +1,10 @@
-import messaging from '@react-native-firebase/messaging';
-import type { RemoteMessage } from '@react-native-firebase/messaging';
 import { Platform } from 'react-native';
-import VoipPushNotification from 'react-native-voip-push-notification';
+import messaging, {
+  FirebaseMessagingTypes,
+} from '@react-native-firebase/messaging';
 import * as CallKeepService from './callkeep';
 import { navigate } from './navigationRef';
+import { api } from './api';
 
 // ─── Notification payload types ──────────────────────────
 
@@ -34,7 +35,11 @@ let initialized = false;
 export async function setup(): Promise<void> {
   if (initialized) return;
 
-  const authorized = await requestPermission();
+  const status = await messaging().requestPermission();
+  const authorized =
+    status === messaging.AuthorizationStatus.AUTHORIZED ||
+    status === messaging.AuthorizationStatus.PROVISIONAL;
+
   if (!authorized) {
     console.warn('[Push] notification permission denied');
     return;
@@ -49,16 +54,6 @@ export async function setup(): Promise<void> {
   }
 
   initialized = true;
-}
-
-// ─── Permission ──────────────────────────────────────────
-
-async function requestPermission(): Promise<boolean> {
-  const status = await messaging().requestPermission();
-  return (
-    status === messaging.AuthorizationStatus.AUTHORIZED ||
-    status === messaging.AuthorizationStatus.PROVISIONAL
-  );
 }
 
 // ─── FCM Token ───────────────────────────────────────────
@@ -81,8 +76,7 @@ async function sendTokenToServer(
   isVoIP: boolean,
 ): Promise<void> {
   const platform = Platform.OS as 'ios' | 'android';
-  // TODO: POST /api/v1/push/register { token, platform, isVoIP }
-  console.log(`[Push] register token (${platform}, voip=${isVoIP}):`, token);
+  await api.post('/push/register', { token, platform, isVoIP });
 }
 
 // ─── Unregister (on logout) ──────────────────────────────
@@ -90,8 +84,7 @@ async function sendTokenToServer(
 export async function unregister(): Promise<void> {
   try {
     const token = await messaging().getToken();
-    // TODO: DELETE /api/v1/push/unregister { token }
-    console.log('[Push] unregister token:', token);
+    await api.delete('/push/unregister', { data: { token } });
     await messaging().deleteToken();
   } catch (e) {
     console.warn('[Push] unregister failed:', e);
@@ -101,6 +94,14 @@ export async function unregister(): Promise<void> {
 // ─── VoIP Push (iOS) ─────────────────────────────────────
 
 function setupVoIPPush(): void {
+  let VoipPushNotification: typeof import('react-native-voip-push-notification').default;
+  try {
+    VoipPushNotification = require('react-native-voip-push-notification').default;
+  } catch {
+    console.warn('[Push] VoIP push module not available');
+    return;
+  }
+
   VoipPushNotification.addEventListener('register', async (token) => {
     await sendTokenToServer(token, true);
   });
@@ -147,32 +148,26 @@ function setupForegroundHandler(): void {
     if (!data) return;
 
     if (data.type === 'call') {
-      // Show native incoming call UI
       CallKeepService.displayIncomingCall(
         data.callId,
         data.callerName,
         data.callType === 'video',
       );
     }
-    // Message notifications in foreground are handled by in-app UI
-    // (toast/banner via socket events) — no system notification needed
   });
 }
 
 // ─── Notification tap handlers ───────────────────────────
 
 function setupNotificationOpenHandlers(): void {
-  // App was in background when notification was tapped
   messaging().onNotificationOpenedApp((remoteMessage) => {
     handleNotificationNavigation(remoteMessage.data);
   });
 
-  // App was killed — check for initial notification
   messaging()
     .getInitialNotification()
     .then((remoteMessage) => {
       if (remoteMessage) {
-        // Delay to let navigation mount
         setTimeout(() => {
           handleNotificationNavigation(remoteMessage.data);
         }, 800);
@@ -183,13 +178,12 @@ function setupNotificationOpenHandlers(): void {
 // ─── Background message handler (called from index.js) ──
 
 export async function handleBackgroundMessage(
-  remoteMessage: RemoteMessage,
+  remoteMessage: FirebaseMessagingTypes.RemoteMessage,
 ): Promise<void> {
   const data = parsePayload(remoteMessage.data);
   if (!data) return;
 
   if (data.type === 'call' && Platform.OS === 'android') {
-    // Display incoming call via ConnectionService
     await CallKeepService.setup();
     CallKeepService.displayIncomingCall(
       data.callId,

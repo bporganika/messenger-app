@@ -23,6 +23,8 @@ import { timing } from '../../design-system/animations';
 import { fontFamily, typography } from '../../design-system/typography';
 import { haptics } from '../../design-system/haptics';
 import { Text } from '../../components/ui';
+import { useAuthStore } from '../../stores/authStore';
+import { api } from '../../services/api';
 import { useTranslation } from 'react-i18next';
 import type { AuthScreenProps } from '../../navigation/types';
 
@@ -121,6 +123,7 @@ export function OTPScreen({ navigation, route }: AuthScreenProps<'OTP'>) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const { t } = useTranslation();
+  const setAuth = useAuthStore((s) => s.setAuth);
 
   const [code, setCode] = useState('');
   const [error, setError] = useState(false);
@@ -164,31 +167,39 @@ export function OTPScreen({ navigation, route }: AuthScreenProps<'OTP'>) {
   }, [shakeX]);
 
   const handleSubmit = useCallback(
-    (fullCode: string) => {
+    async (fullCode: string) => {
       if (loading) return;
       setLoading(true);
 
-      // TODO: call POST /auth/otp/verify { target, code: fullCode }
-      // Simulate: wrong code → shake, correct → navigate
-      setTimeout(() => {
-        setLoading(false);
-        const isCorrect = true; // Replace with real API response
+      try {
+        const response = await api.post<{
+          isNewUser: boolean;
+          tempToken?: string;
+          accessToken?: string;
+          refreshToken?: string;
+          user?: { id: string; firstName: string; lastName: string; username: string; avatarUrl: string | null };
+        }>('/auth/otp/verify', { target, code: fullCode });
 
-        if (!isCorrect) {
-          triggerShake();
-          setCode('');
-          inputRef.current?.focus();
-          return;
+        if (response.isNewUser) {
+          navigation.navigate('ProfileSetup', {
+            target,
+            tempToken: response.tempToken!,
+          });
+        } else {
+          setAuth(
+            { accessToken: response.accessToken!, refreshToken: response.refreshToken! },
+            response.user!,
+          );
         }
-
-        // In real flow: if isNewUser → ProfileSetup, else → setAuth
-        navigation.navigate('ProfileSetup', {
-          target,
-          tempToken: 'demo-temp-token',
-        });
-      }, 800);
+      } catch {
+        triggerShake();
+        setCode('');
+        inputRef.current?.focus();
+      } finally {
+        setLoading(false);
+      }
     },
-    [loading, target, navigation, triggerShake],
+    [loading, target, navigation, triggerShake, setAuth],
   );
 
   const handleChangeText = useCallback(
@@ -215,8 +226,8 @@ export function OTPScreen({ navigation, route }: AuthScreenProps<'OTP'>) {
     setError(false);
     setFocusedIndex(0);
     inputRef.current?.focus();
-    // TODO: call POST /auth/otp/send again
-  }, [resendTimer]);
+    api.post('/auth/otp/send', { [target.includes('@') ? 'email' : 'phone']: target });
+  }, [resendTimer, target]);
 
   const formatTimer = (s: number) => {
     const mins = Math.floor(s / 60);
@@ -315,6 +326,7 @@ export function OTPScreen({ navigation, route }: AuthScreenProps<'OTP'>) {
           </Pressable>
         )}
       </Animated.View>
+
     </View>
   );
 }

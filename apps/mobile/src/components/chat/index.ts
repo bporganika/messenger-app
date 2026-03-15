@@ -30,3 +30,17 @@ export type { VideoBubbleProps } from './VideoBubble';
 
 export { DocumentBubble } from './DocumentBubble';
 export type { DocumentBubbleProps } from './DocumentBubble';
+
+export { ChatHeader } from './ChatHeader';
+export type { ChatHeaderProps } from './ChatHeader';
+
+export { DateSeparator } from './DateSeparator';
+export type { DateSeparatorProps } from './DateSeparator';
+
+export { SwipeToReply } from './SwipeToReply';
+export type { SwipeToReplyProps } from './SwipeToReply';
+
+export { AttachmentPicker } from './AttachmentPicker';
+export type { AttachmentPickerProps } from './AttachmentPicker';
+
+export { EmptyChatPlaceholder } from './EmptyChatPlaceholder';

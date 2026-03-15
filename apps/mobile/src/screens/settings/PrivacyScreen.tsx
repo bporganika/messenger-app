@@ -7,6 +7,7 @@ import { useTheme } from '../../design-system';
 import { spacing, radius } from '../../design-system/tokens';
 import { haptics } from '../../design-system/haptics';
 import { Text, Divider } from '../../components/ui';
+import { api } from '../../services/api';
 
 type Visibility = 'everyone' | 'contacts' | 'nobody';
 
@@ -31,10 +32,11 @@ export function PrivacyScreen() {
   const [avatar, setAvatar] = useState<Visibility>('everyone');
 
   const cycle = useCallback(
-    (setter: (v: Visibility) => void, current: Visibility) => {
+    (setter: (v: Visibility) => void, current: Visibility, field: string) => {
       haptics.buttonPress();
-      setter(nextVisibility(current));
-      // TODO: PATCH /api/v1/users/me/privacy
+      const next = nextVisibility(current);
+      setter(next);
+      api.patch('/users/me/privacy', { [field]: next });
     },
     [],
   );
@@ -50,21 +52,21 @@ export function PrivacyScreen() {
             icon={<Svg width={20} height={20} viewBox="0 0 24 24" fill="none"><Path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z" stroke={colors.textSecondary} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" /></Svg>}
             label={t('privacy.phoneNumber')}
             value={t(VISIBILITY_KEYS[phone])}
-            onPress={() => cycle(setPhone, phone)}
+            onPress={() => cycle(setPhone, phone, 'phone')}
           />
           <Divider inset={52} />
           <PrivacyRow
             icon={<Svg width={20} height={20} viewBox="0 0 24 24" fill="none"><Path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" stroke={colors.textSecondary} strokeWidth={1.5} /><Path d="M12 6v6l4 2" stroke={colors.textSecondary} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" /></Svg>}
             label={t('privacy.lastSeen')}
             value={t(VISIBILITY_KEYS[lastSeen])}
-            onPress={() => cycle(setLastSeen, lastSeen)}
+            onPress={() => cycle(setLastSeen, lastSeen, 'lastSeen')}
           />
           <Divider inset={52} />
           <PrivacyRow
             icon={<Svg width={20} height={20} viewBox="0 0 24 24" fill="none"><Path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" stroke={colors.textSecondary} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" /><Path d="M12 3a4 4 0 100 8 4 4 0 000-8z" stroke={colors.textSecondary} strokeWidth={1.5} /></Svg>}
             label={t('privacy.profilePhoto')}
             value={t(VISIBILITY_KEYS[avatar])}
-            onPress={() => cycle(setAvatar, avatar)}
+            onPress={() => cycle(setAvatar, avatar, 'avatar')}
           />
         </View>
       </Animated.View>

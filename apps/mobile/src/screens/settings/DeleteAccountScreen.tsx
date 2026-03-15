@@ -16,6 +16,7 @@ import { spacing, radius } from '../../design-system/tokens';
 import { haptics } from '../../design-system/haptics';
 import { Text, Button } from '../../components/ui';
 import { useAuthStore } from '../../stores/authStore';
+import { api } from '../../services/api';
 
 const CONFIRM_WORD = 'DELETE';
 
@@ -52,14 +53,16 @@ export function DeleteAccountScreen() {
     transform: [{ scale: pulse.value }],
   }));
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     haptics.error();
     setLoading(true);
-    // TODO: DELETE /api/v1/users/me
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      await api.delete('/users/me');
       logout();
-    }, 1200);
+    } catch (e) {
+      console.warn('[DeleteAccount] failed:', e);
+      setLoading(false);
+    }
   };
 
   return (

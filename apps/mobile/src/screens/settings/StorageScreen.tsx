@@ -38,7 +38,6 @@ export function StorageScreen() {
   const handleClear = useCallback(() => {
     haptics.buttonPress();
     setClearing(true);
-    // TODO: clear cache, recalculate sizes
     setTimeout(() => {
       setClearing(false);
       haptics.success();

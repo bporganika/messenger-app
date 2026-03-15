@@ -14,6 +14,7 @@ import { spacing } from '../../design-system/tokens';
 import { haptics } from '../../design-system/haptics';
 import { Text, Button, Input } from '../../components/ui';
 import { useTranslation } from 'react-i18next';
+import { api } from '../../services/api';
 import type { AuthScreenProps } from '../../navigation/types';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -30,11 +31,14 @@ export function EmailAuthScreen({ navigation }: AuthScreenProps<'EmailAuth'>) {
   const handleSendCode = async () => {
     if (!isValid) return;
     setLoading(true);
-    // TODO: call POST /auth/otp/send
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      await api.post('/auth/otp/send', { email });
       navigation.navigate('OTP', { target: email });
-    }, 600);
+    } catch {
+      // Error is handled by the API layer
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

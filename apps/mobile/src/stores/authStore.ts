@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { secureStorage } from '../services/secureStorage';
 
 interface AuthUser {
   id: string;
@@ -21,26 +22,44 @@ interface AuthState {
   setUser: (user: AuthUser) => void;
   logout: () => void;
   setLoading: (loading: boolean) => void;
+  restoreSession: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   accessToken: null,
   refreshToken: null,
   user: null,
-  isLoading: false,
+  isLoading: true,
 
-  setAuth: ({ accessToken, refreshToken }, user) =>
-    set({ accessToken, refreshToken, user, isLoading: false }),
+  setAuth: ({ accessToken, refreshToken }, user) => {
+    secureStorage.setTokens(accessToken, refreshToken);
+    set({ accessToken, refreshToken, user, isLoading: false });
+  },
 
   setUser: (user) => set({ user }),
 
-  logout: () =>
+  logout: () => {
+    secureStorage.clearTokens();
     set({
       accessToken: null,
       refreshToken: null,
       user: null,
       isLoading: false,
-    }),
+    });
+  },
 
   setLoading: (isLoading) => set({ isLoading }),
+
+  restoreSession: async () => {
+    try {
+      const { accessToken, refreshToken } = await secureStorage.getTokens();
+      if (accessToken && refreshToken) {
+        set({ accessToken, refreshToken, isLoading: false });
+      } else {
+        set({ isLoading: false });
+      }
+    } catch {
+      set({ isLoading: false });
+    }
+  },
 }));

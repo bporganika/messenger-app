@@ -1,19 +1,27 @@
 import 'dotenv/config';
 
+function requireEnv(name: string): string {
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`Missing required environment variable: ${name}`);
+  }
+  return value;
+}
+
 export const config = {
   port: Number(process.env['PORT']) || 3000,
   host: process.env['HOST'] || '0.0.0.0',
-  corsOrigin: process.env['CORS_ORIGIN'] || '*',
+  corsOrigin: process.env['CORS_ORIGIN'] || '',
 
   jwt: {
-    secret: process.env['JWT_SECRET'] || 'dev-secret',
-    refreshSecret: process.env['JWT_REFRESH_SECRET'] || 'dev-refresh-secret',
+    secret: requireEnv('JWT_SECRET'),
+    refreshSecret: requireEnv('JWT_REFRESH_SECRET'),
     accessExpiresIn: '15m',
     refreshExpiresIn: '30d',
   },
 
   database: {
-    url: process.env['DATABASE_URL'] || '',
+    url: requireEnv('DATABASE_URL'),
   },
 
   twilio: {
@@ -28,6 +36,14 @@ export const config = {
 
   apple: {
     bundleId: process.env['APPLE_BUNDLE_ID'] || 'com.pulse.messenger',
+  },
+
+  s3: {
+    bucket: process.env['S3_BUCKET'] || '',
+    region: process.env['S3_REGION'] || 'eu-central-1',
+    accessKeyId: process.env['S3_ACCESS_KEY_ID'] || '',
+    secretAccessKey: process.env['S3_SECRET_ACCESS_KEY'] || '',
+    endpoint: process.env['S3_ENDPOINT'] || '',
   },
 
   otp: {

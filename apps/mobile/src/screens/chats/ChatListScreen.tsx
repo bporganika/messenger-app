@@ -1,348 +1,28 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import {
   View,
   StyleSheet,
   FlatList,
   Pressable,
-  TextInput,
   RefreshControl,
-  Alert,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-  withTiming,
-  runOnJS,
-  FadeInUp,
-} from 'react-native-reanimated';
-import {
-  Gesture,
-  GestureDetector,
-} from 'react-native-gesture-handler';
+import Animated, { FadeInUp } from 'react-native-reanimated';
 import Svg, { Path } from 'react-native-svg';
 import { useTheme } from '../../design-system';
-import { springs, timing } from '../../design-system/animations';
-import { spacing, radius } from '../../design-system/tokens';
-import { fontFamily, typography } from '../../design-system/typography';
+import { spacing } from '../../design-system/tokens';
 import { haptics } from '../../design-system/haptics';
 import { useTranslation } from 'react-i18next';
-import { Text, Avatar, Badge, EmptyState } from '../../components/ui';
-import { MessageStatus } from '../../components/chat/MessageStatus';
+import { api } from '../../services/api';
+import { Text, EmptyState } from '../../components/ui';
+import { ChatListItem } from '../../components/chat/ChatListItem';
 import type { ChatScreenProps } from '../../navigation/types';
-import type { MessageType, MessageStatus as MsgStatus } from '@pulse/shared';
+import type { Conversation, DeleteTarget } from './types';
+import { SwipeableRow } from './SwipeableRow';
+import { ChatSearchBar } from './ChatSearchBar';
+import { DeleteConversationModal } from './DeleteConversationModal';
+import { ConversationContextModal } from './ConversationContextModal';
 
-// ─── Types ──────────────────────────────────────────────
-type OnlineStatus = 'online' | 'offline' | 'away';
-
-interface Conversation {
-  id: string;
-  name: string;
-  avatarUrl?: string;
-  onlineStatus: OnlineStatus;
-  lastMessage?: string;
-  lastMessageType: MessageType;
-  lastMessageStatus?: MsgStatus;
-  lastMessageIsSent: boolean;
-  timestamp: string;
-  unreadCount: number;
-  isArchived: boolean;
-}
-
-// ─── Demo Data ──────────────────────────────────────────
-const DEMO_CONVERSATIONS: Conversation[] = [
-  {
-    id: '1',
-    name: 'John Doe',
-    avatarUrl: undefined,
-    onlineStatus: 'online',
-    lastMessage: 'Hey, how are you doing?',
-    lastMessageType: 'text',
-    lastMessageStatus: 'read',
-    lastMessageIsSent: true,
-    timestamp: '2m',
-    unreadCount: 0,
-    isArchived: false,
-  },
-  {
-    id: '2',
-    name: 'Anna Smith',
-    avatarUrl: undefined,
-    onlineStatus: 'offline',
-    lastMessage: undefined,
-    lastMessageType: 'image',
-    lastMessageStatus: undefined,
-    lastMessageIsSent: false,
-    timestamp: '1h',
-    unreadCount: 3,
-    isArchived: false,
-  },
-  {
-    id: '3',
-    name: 'Ali Yılmaz',
-    avatarUrl: undefined,
-    onlineStatus: 'away',
-    lastMessage: undefined,
-    lastMessageType: 'voice',
-    lastMessageStatus: undefined,
-    lastMessageIsSent: false,
-    timestamp: '1d',
-    unreadCount: 0,
-    isArchived: false,
-  },
-  {
-    id: '4',
-    name: 'Maria García',
-    avatarUrl: undefined,
-    onlineStatus: 'online',
-    lastMessage: 'Sure, let me check that for you',
-    lastMessageType: 'text',
-    lastMessageStatus: 'delivered',
-    lastMessageIsSent: true,
-    timestamp: '3h',
-    unreadCount: 0,
-    isArchived: false,
-  },
-  {
-    id: '5',
-    name: 'David Chen',
-    avatarUrl: undefined,
-    onlineStatus: 'offline',
-    lastMessage: undefined,
-    lastMessageType: 'file',
-    lastMessageStatus: undefined,
-    lastMessageIsSent: false,
-    timestamp: '2d',
-    unreadCount: 1,
-    isArchived: false,
-  },
-];
-
-// ─── Message type icon ──────────────────────────────────
-function getMessagePreview(
-  type: MessageType,
-  text: string | undefined,
-  t: (key: string) => string,
-): string {
-  switch (type) {
-    case 'image':
-      return '📷 ' + t('chat.photo');
-    case 'video':
-      return '🎬 ' + t('chat.videoType');
-    case 'voice':
-      return '🎤 ' + t('chat.voiceMessage');
-    case 'file':
-      return '📎 ' + t('chat.document');
-    default:
-      return text ?? '';
-  }
-}
-
-// ─── Swipe action background ────────────────────────────
-const SWIPE_THRESHOLD = 80;
-
-function SwipeableRow({
-  children,
-  onArchive,
-  onDelete,
-}: {
-  children: React.ReactNode;
-  onArchive: () => void;
-  onDelete: () => void;
-}) {
-  const { colors } = useTheme();
-  const { t } = useTranslation();
-  const translateX = useSharedValue(0);
-  const rowHeight = useSharedValue<number | undefined>(undefined);
-
-  const triggerArchive = useCallback(() => {
-    haptics.buttonPress();
-    onArchive();
-  }, [onArchive]);
-
-  const triggerDelete = useCallback(() => {
-    haptics.deleteAction();
-    onDelete();
-  }, [onDelete]);
-
-  const panGesture = Gesture.Pan()
-    .activeOffsetX([-15, 15])
-    .failOffsetY([-10, 10])
-    .onUpdate((e) => {
-      translateX.value = e.translationX;
-    })
-    .onEnd((e) => {
-      if (e.translationX > SWIPE_THRESHOLD) {
-        // Swipe right → archive
-        translateX.value = withSpring(0, springs.snappy);
-        runOnJS(triggerArchive)();
-      } else if (e.translationX < -SWIPE_THRESHOLD) {
-        // Swipe left → delete
-        translateX.value = withSpring(0, springs.snappy);
-        runOnJS(triggerDelete)();
-      } else {
-        translateX.value = withSpring(0, springs.snappy);
-      }
-    });
-
-  const rowStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: translateX.value }],
-  }));
-
-  // Left background (archive — revealed on swipe right)
-  const leftBgStyle = useAnimatedStyle(() => ({
-    opacity: translateX.value > 20 ? 1 : 0,
-  }));
-
-  // Right background (delete — revealed on swipe left)
-  const rightBgStyle = useAnimatedStyle(() => ({
-    opacity: translateX.value < -20 ? 1 : 0,
-  }));
-
-  return (
-    <View>
-      {/* Archive background (left) */}
-      <Animated.View
-        style={[
-          styles.swipeBg,
-          styles.swipeBgLeft,
-          { backgroundColor: colors.accentSuccess },
-          leftBgStyle,
-        ]}>
-        <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
-          <Path
-            d="M21 8v13H3V8M1 3h22v5H1zM10 12h4"
-            stroke="#FFFFFF"
-            strokeWidth={2}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </Svg>
-        <Text variant="caption" color="#FFFFFF" style={styles.swipeLabel}>
-          {t('chat.archive')}
-        </Text>
-      </Animated.View>
-
-      {/* Delete background (right) */}
-      <Animated.View
-        style={[
-          styles.swipeBg,
-          styles.swipeBgRight,
-          { backgroundColor: colors.accentError },
-          rightBgStyle,
-        ]}>
-        <Svg width={22} height={22} viewBox="0 0 24 24" fill="none">
-          <Path
-            d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z"
-            stroke="#FFFFFF"
-            strokeWidth={2}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </Svg>
-        <Text variant="caption" color="#FFFFFF" style={styles.swipeLabel}>
-          {t('common.delete')}
-        </Text>
-      </Animated.View>
-
-      {/* Foreground row */}
-      <GestureDetector gesture={panGesture}>
-        <Animated.View style={rowStyle}>{children}</Animated.View>
-      </GestureDetector>
-    </View>
-  );
-}
-
-// ─── Chat list row ──────────────────────────────────────
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-
-function ChatRow({
-  item,
-  onPress,
-  onLongPress,
-}: {
-  item: Conversation;
-  onPress: () => void;
-  onLongPress: () => void;
-}) {
-  const { colors } = useTheme();
-  const { t } = useTranslation();
-  const scale = useSharedValue(1);
-
-  const animStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
-
-  const handlePressIn = useCallback(() => {
-    scale.value = withSpring(0.98, springs.snappy);
-  }, [scale]);
-
-  const handlePressOut = useCallback(() => {
-    scale.value = withSpring(1, springs.snappy);
-  }, [scale]);
-
-  const preview = getMessagePreview(item.lastMessageType, item.lastMessage, t);
-
-  return (
-    <AnimatedPressable
-      onPress={() => {
-        haptics.buttonPress();
-        onPress();
-      }}
-      onLongPress={() => {
-        haptics.longPress();
-        onLongPress();
-      }}
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
-      style={[styles.row, { backgroundColor: colors.bgPrimary }, animStyle]}>
-      <Avatar
-        uri={item.avatarUrl}
-        name={item.name}
-        size="lg"
-        status={item.onlineStatus}
-      />
-
-      <View style={styles.rowContent}>
-        {/* Top row: name + timestamp */}
-        <View style={styles.topRow}>
-          <Text variant="bodyLg" numberOfLines={1} style={styles.rowName}>
-            {item.name}
-          </Text>
-          <Text
-            variant="caption"
-            color={
-              item.unreadCount > 0
-                ? colors.accentPrimary
-                : colors.textTertiary
-            }>
-            {item.timestamp}
-          </Text>
-        </View>
-
-        {/* Bottom row: preview + badge */}
-        <View style={styles.bottomRow}>
-          <View style={styles.previewRow}>
-            {item.lastMessageIsSent && item.lastMessageStatus && (
-              <MessageStatus status={item.lastMessageStatus} />
-            )}
-            <Text
-              variant="bodySm"
-              color={colors.textSecondary}
-              numberOfLines={1}
-              style={styles.previewText}>
-              {preview}
-            </Text>
-          </View>
-          {item.unreadCount > 0 && <Badge count={item.unreadCount} />}
-        </View>
-      </View>
-    </AnimatedPressable>
-  );
-}
-
-// ─── Separator ──────────────────────────────────────────
 function ItemSeparator() {
   const { colors } = useTheme();
   return (
@@ -355,19 +35,17 @@ function ItemSeparator() {
   );
 }
 
-// ─── Screen ─────────────────────────────────────────────
 export function ChatListScreen({ navigation }: ChatScreenProps<'ChatList'>) {
   const { colors } = useTheme();
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
 
   const [search, setSearch] = useState('');
-  const [searchFocused, setSearchFocused] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [conversations, setConversations] =
-    useState<Conversation[]>(DEMO_CONVERSATIONS);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [deleteTarget, setDeleteTarget] = useState<DeleteTarget | null>(null);
+  const [contextTarget, setContextTarget] = useState<Conversation | null>(null);
 
-  // Filter conversations by search
   const filtered = useMemo(() => {
     const active = conversations.filter((c) => !c.isArchived);
     if (!search.trim()) return active;
@@ -379,69 +57,65 @@ export function ChatListScreen({ navigation }: ChatScreenProps<'ChatList'>) {
     );
   }, [conversations, search]);
 
-  const handleRefresh = useCallback(() => {
+  const handleRefresh = useCallback(async () => {
     setRefreshing(true);
     haptics.pullToRefresh();
-    // TODO: re-fetch conversations from API
-    setTimeout(() => setRefreshing(false), 1000);
+    try {
+      const data = await api.get<{ conversations: Conversation[] }>(
+        '/conversations',
+      );
+      setConversations(data.conversations);
+    } catch (e) {
+      console.warn('[ChatList] refresh failed:', e);
+    } finally {
+      setRefreshing(false);
+    }
   }, []);
 
-  const handleArchive = useCallback(
-    (id: string) => {
+  useEffect(() => {
+    handleRefresh();
+  }, [handleRefresh]);
+
+  const handleArchive = useCallback((id: string) => {
+    setConversations((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, isArchived: true } : c)),
+    );
+  }, []);
+
+  const handleDelete = useCallback((id: string, name: string) => {
+    setDeleteTarget({ id, name });
+  }, []);
+
+  const confirmDelete = useCallback(() => {
+    if (deleteTarget) {
       setConversations((prev) =>
-        prev.map((c) => (c.id === id ? { ...c, isArchived: true } : c)),
+        prev.filter((c) => c.id !== deleteTarget.id),
       );
-    },
-    [],
-  );
+      setDeleteTarget(null);
+    }
+  }, [deleteTarget]);
 
-  const handleDelete = useCallback(
-    (id: string, name: string) => {
-      // TODO: replace Alert with custom modal
-      Alert.alert(
-        t('chat.deleteConversation'),
-        t('chat.deleteConversationMsg', { name }),
-        [
-          { text: t('common.cancel'), style: 'cancel' },
-          {
-            text: t('common.delete'),
-            style: 'destructive',
-            onPress: () => {
-              setConversations((prev) => prev.filter((c) => c.id !== id));
-            },
-          },
-        ],
-      );
-    },
-    [],
-  );
-
-  const handleLongPress = useCallback(
-    (item: Conversation) => {
-      // TODO: replace with custom context menu / bottom sheet
-      Alert.alert(item.name, undefined, [
-        {
-          text: t('chat.archive'),
-          onPress: () => handleArchive(item.id),
-        },
-        {
-          text: t('common.delete'),
-          style: 'destructive',
-          onPress: () => handleDelete(item.id, item.name),
-        },
-        { text: t('common.cancel'), style: 'cancel' },
-      ]);
-    },
-    [handleArchive, handleDelete],
-  );
+  const handleLongPress = useCallback((item: Conversation) => {
+    setContextTarget(item);
+  }, []);
 
   const renderItem = useCallback(
     ({ item }: { item: Conversation }) => (
       <SwipeableRow
         onArchive={() => handleArchive(item.id)}
         onDelete={() => handleDelete(item.id, item.name)}>
-        <ChatRow
-          item={item}
+        <ChatListItem
+          id={item.id}
+          name={item.name}
+          avatarUri={item.avatarUrl}
+          onlineStatus={item.onlineStatus}
+          lastMessage={item.lastMessage}
+          lastMessageType={item.lastMessageType}
+          lastMessageStatus={item.lastMessageStatus}
+          lastMessageIsSent={item.lastMessageIsSent}
+          timestamp={item.timestamp}
+          unreadCount={item.unreadCount}
+          style={{ backgroundColor: colors.bgPrimary }}
           onPress={() =>
             navigation.navigate('Chat', {
               conversationId: item.id,
@@ -453,7 +127,7 @@ export function ChatListScreen({ navigation }: ChatScreenProps<'ChatList'>) {
         />
       </SwipeableRow>
     ),
-    [navigation, handleArchive, handleDelete, handleLongPress],
+    [navigation, handleArchive, handleDelete, handleLongPress, colors.bgPrimary],
   );
 
   const keyExtractor = useCallback((item: Conversation) => item.id, []);
@@ -467,13 +141,13 @@ export function ChatListScreen({ navigation }: ChatScreenProps<'ChatList'>) {
           paddingTop: insets.top + spacing['12'],
         },
       ]}>
-      {/* ── Header ── */}
+      {/* Header */}
       <Animated.View entering={FadeInUp.springify()} style={styles.header}>
         <Text variant="displayLg">{t('tabs.chats')}</Text>
         <Pressable
           onPress={() => {
             haptics.buttonPress();
-            // TODO: open new chat / contact picker
+            navigation.getParent()?.navigate('ContactsTab');
           }}
           hitSlop={8}
           style={[
@@ -499,66 +173,10 @@ export function ChatListScreen({ navigation }: ChatScreenProps<'ChatList'>) {
         </Pressable>
       </Animated.View>
 
-      {/* ── Search ── */}
-      <Animated.View
-        entering={FadeInUp.delay(80).springify()}
-        style={[
-          styles.searchBar,
-          {
-            backgroundColor: colors.surfaceDefault,
-            borderColor: searchFocused
-              ? colors.borderFocus
-              : colors.borderDefault,
-          },
-        ]}>
-        <Svg width={18} height={18} viewBox="0 0 24 24" fill="none">
-          <Path
-            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            stroke={colors.textTertiary}
-            strokeWidth={1.5}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </Svg>
-        <TextInput
-          value={search}
-          onChangeText={setSearch}
-          onFocus={() => setSearchFocused(true)}
-          onBlur={() => setSearchFocused(false)}
-          placeholder={t('chat.search')}
-          placeholderTextColor={colors.textPlaceholder}
-          selectionColor={colors.accentPrimary}
-          returnKeyType="search"
-          autoCorrect={false}
-          style={[
-            styles.searchInput,
-            {
-              color: colors.textPrimary,
-              fontFamily: fontFamily.regular,
-              fontSize: typography.bodySm.fontSize,
-            },
-          ]}
-        />
-        {search.length > 0 && (
-          <Pressable
-            onPress={() => {
-              haptics.buttonPress();
-              setSearch('');
-            }}
-            hitSlop={8}>
-            <Svg width={16} height={16} viewBox="0 0 24 24" fill="none">
-              <Path
-                d="M18 6L6 18M6 6l12 12"
-                stroke={colors.textTertiary}
-                strokeWidth={2}
-                strokeLinecap="round"
-              />
-            </Svg>
-          </Pressable>
-        )}
-      </Animated.View>
+      {/* Search */}
+      <ChatSearchBar value={search} onChangeText={setSearch} />
 
-      {/* ── List ── */}
+      {/* List */}
       <FlatList
         data={filtered}
         keyExtractor={keyExtractor}
@@ -619,18 +237,30 @@ export function ChatListScreen({ navigation }: ChatScreenProps<'ChatList'>) {
               }
               actionTitle={t('chat.startChat')}
               onAction={() => {
-                // TODO: navigate to contacts or new chat picker
+                navigation.getParent()?.navigate('ContactsTab');
               }}
             />
           )
         }
         showsVerticalScrollIndicator={false}
       />
+
+      {/* Modals */}
+      <DeleteConversationModal
+        target={deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={confirmDelete}
+      />
+      <ConversationContextModal
+        target={contextTarget}
+        onClose={() => setContextTarget(null)}
+        onArchive={handleArchive}
+        onDelete={handleDelete}
+      />
     </View>
   );
 }
 
-// ─── Styles ─────────────────────────────────────────────
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -649,97 +279,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-
-  // Search
-  searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginHorizontal: spacing['16'],
-    marginBottom: spacing['8'],
-    paddingHorizontal: spacing['12'],
-    height: 40,
-    borderRadius: radius.full,
-    borderWidth: 1,
-    gap: spacing['8'],
-  },
-  searchInput: {
-    flex: 1,
-    height: '100%',
-    padding: 0,
-    includeFontPadding: false,
-  },
-
-  // List
   list: {
     paddingBottom: spacing['16'],
   },
   emptyContainer: {
     flex: 1,
   },
-
-  // Row
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: spacing['16'],
-    paddingVertical: spacing['12'],
-  },
-  rowContent: {
-    flex: 1,
-    marginLeft: spacing['12'],
-  },
-  topRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: spacing['4'],
-  },
-  rowName: {
-    flex: 1,
-    marginRight: spacing['8'],
-    fontWeight: '600',
-  },
-  bottomRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  previewRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-    marginRight: spacing['8'],
-    gap: spacing['4'],
-  },
-  previewText: {
-    flex: 1,
-  },
-
-  // Separator
   separator: {
     height: StyleSheet.hairlineWidth,
-    marginLeft: spacing['16'] + 60 + spacing['12'], // align with text start
+    marginLeft: spacing['16'] + 60 + spacing['12'],
   },
-
-  // Swipe backgrounds
-  swipeBg: {
-    ...StyleSheet.absoluteFillObject,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing['8'],
-    paddingHorizontal: spacing['24'],
-  },
-  swipeBgLeft: {
-    justifyContent: 'flex-start',
-  },
-  swipeBgRight: {
-    justifyContent: 'flex-end',
-  },
-  swipeLabel: {
-    fontWeight: '700',
-  },
-
-  // Empty / no results
   emptyIcon: {
     width: 64,
     height: 64,

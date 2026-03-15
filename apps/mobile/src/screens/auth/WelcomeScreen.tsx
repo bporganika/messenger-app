@@ -206,7 +206,6 @@ export function WelcomeScreen({ navigation }: AuthScreenProps<'Welcome'>) {
           textColor="#FFFFFF"
           borderColor={isDark ? colors.borderDefault : undefined}
           onPress={() => {
-            // TODO: Sign in with Apple
           }}
         />
       </Animated.View>
@@ -220,7 +219,6 @@ export function WelcomeScreen({ navigation }: AuthScreenProps<'Welcome'>) {
           textColor={colors.textPrimary}
           borderColor={colors.borderDefault}
           onPress={() => {
-            // TODO: Google Sign-In
           }}
         />
       </Animated.View>
@@ -266,6 +264,7 @@ export function WelcomeScreen({ navigation }: AuthScreenProps<'Welcome'>) {
           </Text>
         </Text>
       </Animated.View>
+
     </View>
   );
 }

@@ -7,6 +7,7 @@ import { useTheme } from '../../design-system';
 import { spacing, radius } from '../../design-system/tokens';
 import { haptics } from '../../design-system/haptics';
 import { Text, Avatar, Divider } from '../../components/ui';
+import { api } from '../../services/api';
 import type { ContactScreenProps } from '../../navigation/types';
 
 function ActionCircle({
@@ -41,7 +42,7 @@ export function UserProfileScreen({
   navigation,
   route,
 }: ContactScreenProps<'UserProfile'>) {
-  const { name, avatarUrl } = route.params;
+  const { userId, name, avatarUrl } = route.params;
   const { t } = useTranslation();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
@@ -98,8 +99,9 @@ export function UserProfileScreen({
             </Svg>
           }
           label={t('userProfile.chat')}
-          onPress={() => {
-            // TODO: find or create conversation, navigate to Chat
+          onPress={async () => {
+            const data = await api.post<{ conversationId: string }>('/conversations', { userId });
+            navigation.navigate('Chat' as never, { conversationId: data.conversationId, name, avatarUrl } as never);
           }}
         />
         <ActionCircle
@@ -138,9 +140,9 @@ export function UserProfileScreen({
 
       {/* Block / Report */}
       <Pressable
-        onPress={() => {
+        onPress={async () => {
           haptics.error();
-          // TODO: block user
+          await api.post('/blocks', { userId });
         }}
         style={styles.dangerRow}>
         <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
@@ -158,9 +160,9 @@ export function UserProfileScreen({
       </Pressable>
 
       <Pressable
-        onPress={() => {
+        onPress={async () => {
           haptics.buttonPress();
-          // TODO: report user
+          await api.post('/reports', { userId });
         }}
         style={styles.dangerRow}>
         <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">

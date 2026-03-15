@@ -8,8 +8,11 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ThemeProvider, useTheme } from './design-system';
 import { RootNavigator } from './navigation/RootNavigator';
 import { LockScreen } from './screens/lock/LockScreen';
+import { ErrorBoundary } from './components/ui';
 import { useAppLockStore } from './stores/appLockStore';
+import { useAuthStore } from './stores/authStore';
 import { navigationRef } from './services/navigationRef';
+import { connectSocket, disconnectSocket } from './services/socket';
 import * as CallKeepService from './services/callkeep';
 import * as PushService from './services/push';
 
@@ -52,11 +55,22 @@ function AppLockGuard() {
 
 function AppContent() {
   const { isDark } = useTheme();
+  const restoreSession = useAuthStore((s) => s.restoreSession);
 
   useEffect(() => {
+    restoreSession().then(() => {
+      const { accessToken } = useAuthStore.getState();
+      if (accessToken) {
+        connectSocket();
+      }
+    });
     CallKeepService.setup();
     PushService.setup();
-  }, []);
+
+    return () => {
+      disconnectSocket();
+    };
+  }, [restoreSession]);
 
   return (
     <NavigationContainer ref={navigationRef}>
@@ -73,12 +87,14 @@ function AppContent() {
 
 export default function App() {
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaProvider>
-        <ThemeProvider>
-          <AppContent />
-        </ThemeProvider>
-      </SafeAreaProvider>
-    </GestureHandlerRootView>
+    <ErrorBoundary>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <SafeAreaProvider>
+          <ThemeProvider>
+            <AppContent />
+          </ThemeProvider>
+        </SafeAreaProvider>
+      </GestureHandlerRootView>
+    </ErrorBoundary>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { View, Pressable, StyleSheet } from 'react-native';
+import { View, Pressable, StyleSheet, ViewStyle } from 'react-native';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -9,6 +9,7 @@ import { useTheme } from '../../design-system';
 import { springs } from '../../design-system/animations';
 import { spacing } from '../../design-system/tokens';
 import { haptics } from '../../design-system/haptics';
+import { useTranslation } from 'react-i18next';
 import type { MessageStatus as Status, MessageType } from '@pulse/shared';
 import { Text } from '../ui/Text';
 import { Avatar } from '../ui/Avatar';
@@ -32,16 +33,18 @@ export interface ChatListItemProps {
   unreadCount?: number;
   onPress?: () => void;
   onLongPress?: () => void;
+  style?: ViewStyle;
 }
 
 function getMessagePreview(
   type: MessageType | undefined,
   text: string | undefined,
+  t: (key: string) => string,
 ): string {
-  if (type === 'image') return '📷 Photo';
-  if (type === 'video') return '🎬 Video';
-  if (type === 'voice') return '🎤 Voice message';
-  if (type === 'file') return '📎 Document';
+  if (type === 'image') return '📷 ' + t('chat.photo');
+  if (type === 'video') return '🎬 ' + t('chat.videoType');
+  if (type === 'voice') return '🎤 ' + t('chat.voiceMessage');
+  if (type === 'file') return '📎 ' + t('chat.document');
   return text ?? '';
 }
 
@@ -57,8 +60,10 @@ export function ChatListItem({
   unreadCount = 0,
   onPress,
   onLongPress,
+  style,
 }: ChatListItemProps) {
   const { colors } = useTheme();
+  const { t } = useTranslation();
   const scale = useSharedValue(1);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -83,7 +88,7 @@ export function ChatListItem({
     onLongPress?.();
   }, [onLongPress]);
 
-  const preview = getMessagePreview(lastMessageType, lastMessage);
+  const preview = getMessagePreview(lastMessageType, lastMessage, t);
 
   return (
     <AnimatedPressable
@@ -91,7 +96,7 @@ export function ChatListItem({
       onLongPress={handleLongPress}
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
-      style={[styles.container, animatedStyle]}>
+      style={[styles.container, style, animatedStyle]}>
       <Avatar
         uri={avatarUri}
         name={name}

@@ -2,7 +2,6 @@ import React, { useCallback } from 'react';
 import {
   Pressable,
   StyleSheet,
-  ActivityIndicator,
   ViewStyle,
   TextStyle,
   View,
@@ -11,6 +10,10 @@ import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withSpring,
+  withTiming,
+  withDelay,
+  withRepeat,
+  withSequence,
 } from 'react-native-reanimated';
 import { useTheme } from '../../design-system';
 import { springs } from '../../design-system/animations';
@@ -19,6 +22,46 @@ import { haptics } from '../../design-system/haptics';
 import { Text } from './Text';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+const AnimatedDot = Animated.View;
+
+function LoadingDots({ color }: { color: string }) {
+  const dot1 = useSharedValue(0.3);
+  const dot2 = useSharedValue(0.3);
+  const dot3 = useSharedValue(0.3);
+
+  React.useEffect(() => {
+    const animate = (sv: Animated.SharedValue<number>, delay: number) => {
+      sv.value = withDelay(
+        delay,
+        withRepeat(
+          withSequence(
+            withTiming(1, { duration: 300 }),
+            withTiming(0.3, { duration: 300 }),
+          ),
+          -1,
+          false,
+        ),
+      );
+    };
+    animate(dot1, 0);
+    animate(dot2, 150);
+    animate(dot3, 300);
+  }, [dot1, dot2, dot3]);
+
+  const s1 = useAnimatedStyle(() => ({ opacity: dot1.value }));
+  const s2 = useAnimatedStyle(() => ({ opacity: dot2.value }));
+  const s3 = useAnimatedStyle(() => ({ opacity: dot3.value }));
+
+  const dotStyle = { width: 6, height: 6, borderRadius: 3, backgroundColor: color, marginHorizontal: 2 };
+
+  return (
+    <View style={styles.dotsRow}>
+      <AnimatedDot style={[dotStyle, s1]} />
+      <AnimatedDot style={[dotStyle, s2]} />
+      <AnimatedDot style={[dotStyle, s3]} />
+    </View>
+  );
+}
 
 type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
 type ButtonSize = 'sm' | 'md' | 'lg';
@@ -87,10 +130,7 @@ export function Button({
         style,
       ]}>
       {loading ? (
-        <ActivityIndicator
-          size="small"
-          color={labelStyle.color}
-        />
+        <LoadingDots color={labelStyle.color as string} />
       ) : (
         <View style={styles.content}>
           {leftIcon}
@@ -171,5 +211,10 @@ const styles = StyleSheet.create({
   },
   disabled: {
     opacity: 0.4,
+  },
+  dotsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

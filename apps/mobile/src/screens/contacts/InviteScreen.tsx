@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Share } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../design-system';
 import { spacing } from '../../design-system/tokens';
 import { Text, Button } from '../../components/ui';
+import { api } from '../../services/api';
 import type { ContactScreenProps } from '../../navigation/types';
 
 export function InviteScreen({ navigation }: ContactScreenProps<'Invite'>) {
@@ -13,9 +14,16 @@ export function InviteScreen({ navigation }: ContactScreenProps<'Invite'>) {
   const { colors, brand } = useTheme();
   const insets = useSafeAreaInsets();
 
+  const [inviteLink, setInviteLink] = useState('');
+
+  useEffect(() => {
+    api.get<{ link: string }>('/users/me/invite-link').then(data => setInviteLink(data.link));
+  }, []);
+
   const handleShare = async () => {
+    if (!inviteLink) return;
     await Share.share({
-      message: t('contacts.shareMessage', { link: 'https://pulse.app/invite/demo' }),
+      message: t('contacts.shareMessage', { link: inviteLink }),
     });
   };
 
