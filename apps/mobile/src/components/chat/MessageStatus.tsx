@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
   container: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginLeft: 4,
+    marginStart: 4,
   },
   clock: {
     width: 10,

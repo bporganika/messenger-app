@@ -3,11 +3,12 @@ import { View, StyleSheet, FlatList } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 import { api } from '../../services/api';
+import { formatMessageTime } from '../../utils/dateFormatter';
 import { useTheme } from '../../design-system';
 import { spacing } from '../../design-system/tokens';
 import { haptics } from '../../design-system/haptics';
 import { useTranslation } from 'react-i18next';
-import { Text } from '../../components/ui';
+import { Text, EmptyState } from '../../components/ui';
 import {
   ChatBubble,
   ChatHeader,
@@ -41,6 +42,7 @@ export function ChatScreen({ navigation, route }: ChatScreenProps<'Chat'>) {
   const [attachVisible, setAttachVisible] = useState(false);
   const [loadingOlder, setLoadingOlder] = useState(false);
   const [hasOlderMessages, setHasOlderMessages] = useState(true);
+  const [loadError, setLoadError] = useState(false);
 
   const flatListRef = useRef<FlatList>(null);
   const recordTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -55,11 +57,7 @@ export function ChatScreen({ navigation, route }: ChatScreenProps<'Chat'>) {
       type: 'text',
       isSent: true,
       text,
-      timestamp: new Date().toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-      }),
+      timestamp: formatMessageTime(new Date()),
       status: 'sending',
       replyToId: replyTo?.id,
       replyToSender: replyTo ? (replyTo.isSent ? t('chat.you') : name) : undefined,
@@ -106,11 +104,7 @@ export function ChatScreen({ navigation, route }: ChatScreenProps<'Chat'>) {
       id: Date.now().toString(),
       type: 'voice',
       isSent: true,
-      timestamp: new Date().toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-      }),
+      timestamp: formatMessageTime(new Date()),
       status: 'sending',
       mediaDuration: recordElapsed,
     };
@@ -133,8 +127,8 @@ export function ChatScreen({ navigation, route }: ChatScreenProps<'Chat'>) {
       );
       setMessages((prev) => [...prev, ...data.messages]);
       setHasOlderMessages(data.hasMore);
-    } catch (e) {
-      console.warn('[Chat] load older failed:', e);
+    } catch {
+      if (messages.length === 0) setLoadError(true);
     } finally {
       setLoadingOlder(false);
     }
@@ -279,7 +273,17 @@ export function ChatScreen({ navigation, route }: ChatScreenProps<'Chat'>) {
             </View>
           ) : null
         }
-        ListEmptyComponent={<EmptyChatPlaceholder />}
+        ListEmptyComponent={
+          loadError ? (
+            <EmptyState
+              title={t('common.error')}
+              actionTitle={t('common.retry')}
+              onAction={() => { setLoadError(false); handleLoadOlder(); }}
+            />
+          ) : (
+            <EmptyChatPlaceholder />
+          )
+        }
       />
 
       {/* ── Reply preview ── */}

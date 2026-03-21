@@ -1,267 +1,63 @@
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import {
   View,
   StyleSheet,
   FlatList,
-  Pressable,
   RefreshControl,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-  FadeInUp,
-} from 'react-native-reanimated';
+import Animated, { FadeInUp } from 'react-native-reanimated';
 import Svg, { Path } from 'react-native-svg';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../design-system';
-import { springs } from '../../design-system/animations';
-import { spacing, radius } from '../../design-system/tokens';
+import { spacing } from '../../design-system/tokens';
 import { haptics } from '../../design-system/haptics';
-import { Text, Avatar, EmptyState } from '../../components/ui';
+import { Text, EmptyState, Skeleton } from '../../components/ui';
+import { CallHistoryItem } from '../../components/call/CallHistoryItem';
+import type { CallEntry } from '../../components/call/CallHistoryItem';
 import { api } from '../../services/api';
 import type { RootStackParamList } from '../../navigation/types';
 
-// ─── Types ──────────────────────────────────────────────
-type CallDirection = 'incoming' | 'outgoing' | 'missed';
-type CallType = 'voice' | 'video';
-
-interface CallEntry {
-  id: string;
-  userId: string;
-  name: string;
-  avatarUrl?: string;
-  direction: CallDirection;
-  callType: CallType;
-  timestamp: string;
-  duration?: string;
-}
-
-// ─── Direction icon ─────────────────────────────────────
-function DirectionIcon({
-  direction,
-  color,
-}: {
-  direction: CallDirection;
-  color: string;
-}) {
-  if (direction === 'outgoing') {
-    // ↗ Arrow top-right
-    return (
-      <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
-        <Path
-          d="M7 17L17 7M17 7H7M17 7v10"
-          stroke={color}
-          strokeWidth={2.5}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </Svg>
-    );
-  }
-
-  // ↙ Arrow bottom-left (incoming + missed)
-  return (
-    <Svg width={14} height={14} viewBox="0 0 24 24" fill="none">
-      <Path
-        d="M17 7L7 17M7 17h10M7 17V7"
-        stroke={color}
-        strokeWidth={2.5}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </Svg>
-  );
-}
-
-// ─── Call type icon (right side) ────────────────────────
-function CallTypeButton({
-  callType,
-  color,
-  onPress,
-}: {
-  callType: CallType;
-  color: string;
-  onPress: () => void;
-}) {
-  return (
-    <Pressable
-      onPress={() => {
-        haptics.buttonPress();
-        onPress();
-      }}
-      hitSlop={10}
-      style={styles.callTypeBtn}>
-      {callType === 'voice' ? (
-        <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
-          <Path
-            d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"
-            stroke={color}
-            strokeWidth={1.5}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </Svg>
-      ) : (
-        <Svg width={20} height={20} viewBox="0 0 24 24" fill="none">
-          <Path
-            d="M23 7l-7 5 7 5V7zM14 5H3a2 2 0 00-2 2v10a2 2 0 002 2h11a2 2 0 002-2V7a2 2 0 00-2-2z"
-            stroke={color}
-            strokeWidth={1.5}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </Svg>
-      )}
-    </Pressable>
-  );
-}
-
-// ─── Call row ───────────────────────────────────────────
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-
-function CallRow({
-  item,
-  onAvatarPress,
-  onCallPress,
-}: {
-  item: CallEntry;
-  onAvatarPress: () => void;
-  onCallPress: () => void;
-}) {
-  const { colors } = useTheme();
-  const scale = useSharedValue(1);
-
-  const animStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
-
-  const handlePressIn = useCallback(() => {
-    scale.value = withSpring(0.98, springs.snappy);
-  }, [scale]);
-
-  const handlePressOut = useCallback(() => {
-    scale.value = withSpring(1, springs.snappy);
-  }, [scale]);
-
-  const isMissed = item.direction === 'missed';
-  const nameColor = isMissed ? colors.accentError : colors.textPrimary;
-  const dirColor = isMissed ? colors.accentError : colors.accentSuccess;
-
-  const { t } = useTranslation();
-
-  const directionLabel =
-    item.direction === 'incoming'
-      ? t('calls.incoming')
-      : item.direction === 'outgoing'
-        ? t('calls.outgoing')
-        : t('calls.missed');
-
-  const typeLabel = item.callType === 'voice' ? t('calls.voice') : t('calls.videoType');
-
-  return (
-    <AnimatedPressable
-      onPress={() => {
-        haptics.buttonPress();
-        onCallPress();
-      }}
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
-      style={[styles.row, animStyle]}>
-      <Avatar
-        uri={item.avatarUrl}
-        name={item.name}
-        size="lg"
-        onPress={onAvatarPress}
-      />
-
-      <View style={styles.rowContent}>
-        <Text
-          variant="bodyLg"
-          color={nameColor}
-          numberOfLines={1}
-          style={styles.rowName}>
-          {item.name}
-        </Text>
-
-        <View style={styles.rowMeta}>
-          <DirectionIcon direction={item.direction} color={dirColor} />
-          <Text variant="bodySm" color={colors.textSecondary}>
-            {directionLabel} · {typeLabel}
-          </Text>
-          {item.duration && (
-            <Text variant="bodySm" color={colors.textTertiary}>
-              {' '}· {item.duration}
-            </Text>
-          )}
-        </View>
-
-        <Text variant="caption" color={colors.textTertiary}>
-          {item.timestamp}
-        </Text>
-      </View>
-
-      <CallTypeButton
-        callType={item.callType}
-        color={colors.accentPrimary}
-        onPress={onCallPress}
-      />
-    </AnimatedPressable>
-  );
-}
-
-// ─── Separator ──────────────────────────────────────────
 function ItemSeparator() {
   const { colors } = useTheme();
   return (
-    <View
-      style={[
-        styles.separator,
-        { backgroundColor: colors.separator },
-      ]}
-    />
+    <View style={[styles.separator, { backgroundColor: colors.separator }]} />
   );
 }
 
-// ─── Screen ─────────────────────────────────────────────
 export function CallHistoryScreen() {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
-  const rootNav =
-    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const rootNav = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
   const [calls, setCalls] = useState<CallEntry[]>([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
-  const loadCalls = useCallback(async () => {
+  const loadCalls = useCallback(async (isRefresh = false) => {
+    if (isRefresh) {
+      setRefreshing(true);
+      haptics.pullToRefresh();
+    }
+    setError(false);
     try {
       const data = await api.get<{ calls: CallEntry[] }>('/calls/history');
       setCalls(data.calls);
     } catch {
-      // silently fail on load
+      setError(true);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
     }
   }, []);
 
   useEffect(() => {
     loadCalls();
   }, [loadCalls]);
-
-  const handleRefresh = useCallback(async () => {
-    setRefreshing(true);
-    haptics.pullToRefresh();
-    try {
-      const data = await api.get<{ calls: CallEntry[] }>('/calls/history');
-      setCalls(data.calls);
-    } catch {
-      // silently fail on refresh
-    } finally {
-      setRefreshing(false);
-    }
-  }, []);
 
   const handleCall = useCallback(
     (item: CallEntry) => {
@@ -271,7 +67,6 @@ export function CallHistoryScreen() {
         name: item.name,
         avatarUrl: item.avatarUrl,
       };
-
       if (item.callType === 'video') {
         rootNav.navigate('VideoCall', params);
       } else {
@@ -283,7 +78,6 @@ export function CallHistoryScreen() {
 
   const handleAvatarPress = useCallback(
     (item: CallEntry) => {
-      // Navigate to UserProfile in ContactsTab
       rootNav.navigate('Main', {
         screen: 'ContactsTab',
         params: {
@@ -301,7 +95,7 @@ export function CallHistoryScreen() {
 
   const renderItem = useCallback(
     ({ item }: { item: CallEntry }) => (
-      <CallRow
+      <CallHistoryItem
         item={item}
         onCallPress={() => handleCall(item)}
         onAvatarPress={() => handleAvatarPress(item)}
@@ -321,25 +115,43 @@ export function CallHistoryScreen() {
           paddingTop: insets.top + spacing['12'],
         },
       ]}>
-      {/* Header */}
       <Animated.View entering={FadeInUp.springify()} style={styles.header}>
         <Text variant="displayLg">{t('calls.title')}</Text>
       </Animated.View>
 
-      {/* List */}
-      <FlatList
+      {loading && (
+        <View style={styles.skeletonWrap}>
+          {Array.from({ length: 6 }).map((_, i) => (
+            <View key={i} style={styles.skeletonRow}>
+              <Skeleton width={60} height={60} variant="circle" />
+              <View style={styles.skeletonText}>
+                <Skeleton width="50%" height={14} variant="text" />
+                <Skeleton width="70%" height={12} variant="text" style={{ marginTop: 6 }} />
+              </View>
+            </View>
+          ))}
+        </View>
+      )}
+
+      {error && !loading && (
+        <EmptyState
+          title={t('common.error')}
+          actionTitle={t('common.retry')}
+          onAction={() => loadCalls()}
+        />
+      )}
+
+      {!loading && !error && <FlatList
         data={calls}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
         ItemSeparatorComponent={ItemSeparator}
-        contentContainerStyle={
-          calls.length === 0 ? styles.emptyContainer : styles.list
-        }
+        contentContainerStyle={calls.length === 0 ? styles.emptyContainer : styles.list}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
-            onRefresh={handleRefresh}
+            onRefresh={() => loadCalls(true)}
             tintColor={colors.accentPrimary}
             colors={[colors.accentPrimary]}
           />
@@ -349,16 +161,8 @@ export function CallHistoryScreen() {
             title={t('calls.noCalls')}
             description={t('calls.noCallsDesc')}
             icon={
-              <View
-                style={[
-                  styles.emptyIcon,
-                  { backgroundColor: colors.surfaceDefault },
-                ]}>
-                <Svg
-                  width={32}
-                  height={32}
-                  viewBox="0 0 24 24"
-                  fill="none">
+              <View style={[styles.emptyIcon, { backgroundColor: colors.surfaceDefault }]}>
+                <Svg width={32} height={32} viewBox="0 0 24 24" fill="none">
                   <Path
                     d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"
                     stroke={colors.accentPrimary}
@@ -371,12 +175,11 @@ export function CallHistoryScreen() {
             }
           />
         }
-      />
+      />}
     </View>
   );
 }
 
-// ─── Styles ─────────────────────────────────────────────
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -391,45 +194,24 @@ const styles = StyleSheet.create({
   emptyContainer: {
     flex: 1,
   },
-
-  // Row
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: spacing['16'],
-    paddingVertical: spacing['12'],
-  },
-  rowContent: {
-    flex: 1,
-    marginLeft: spacing['12'],
-  },
-  rowName: {
-    fontWeight: '600',
-    marginBottom: spacing['2'],
-  },
-  rowMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing['4'],
-    marginBottom: spacing['2'],
-  },
-
-  // Call type button
-  callTypeBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  // Separator
   separator: {
     height: StyleSheet.hairlineWidth,
-    marginLeft: spacing['16'] + 60 + spacing['12'],
+    marginStart: spacing['16'] + 60 + spacing['12'],
   },
-
-  // Empty
+  skeletonWrap: {
+    flex: 1,
+    paddingHorizontal: spacing['16'],
+  },
+  skeletonRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: spacing['12'],
+    gap: spacing['12'],
+  },
+  skeletonText: {
+    flex: 1,
+    gap: spacing['4'],
+  },
   emptyIcon: {
     width: 64,
     height: 64,

@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing['12'],
     borderRadius: radius.xl,
     borderWidth: 1,
-    marginLeft: spacing['12'],
+    marginStart: spacing['12'],
     marginVertical: spacing['4'],
   },
   dot: {

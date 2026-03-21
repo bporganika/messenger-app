@@ -129,10 +129,10 @@ const styles = StyleSheet.create({
   rowIcon: {
     width: 28,
     alignItems: 'center',
-    marginRight: spacing['12'],
+    marginEnd: spacing['12'],
   },
   rowLabel: { flex: 1 },
-  chevron: { marginLeft: spacing['4'] },
+  chevron: { marginStart: spacing['4'] },
   hint: {
     marginHorizontal: spacing['24'],
     marginTop: spacing['16'],

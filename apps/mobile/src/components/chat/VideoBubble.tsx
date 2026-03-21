@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
   duration: {
     position: 'absolute',
     bottom: spacing['8'],
-    right: spacing['8'],
+    end: spacing['8'],
     backgroundColor: 'rgba(0,0,0,0.6)',
     borderRadius: 4,
     paddingHorizontal: spacing['6'],

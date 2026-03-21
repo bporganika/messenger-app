@@ -17,6 +17,6 @@ export function ItemSeparator() {
 const styles = StyleSheet.create({
   separator: {
     height: StyleSheet.hairlineWidth,
-    marginLeft: spacing['16'] + 44 + spacing['12'],
+    marginStart: spacing['16'] + 44 + spacing['12'],
   },
 });

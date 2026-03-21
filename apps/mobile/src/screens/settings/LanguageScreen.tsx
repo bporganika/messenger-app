@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing['16'],
     paddingVertical: spacing['12'],
   },
-  flag: { width: 28, textAlign: 'center', marginRight: spacing['12'] },
+  flag: { width: 28, textAlign: 'center', marginEnd: spacing['12'] },
   rowText: { flex: 1, gap: spacing['2'] },
   checkCircle: {
     width: 24,

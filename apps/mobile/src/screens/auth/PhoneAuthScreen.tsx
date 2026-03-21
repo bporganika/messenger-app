@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeInUp } from 'react-native-reanimated';
+import Svg, { Path } from 'react-native-svg';
 import { useTheme } from '../../design-system';
 import { spacing, radius } from '../../design-system/tokens';
 import { fontFamily, typography } from '../../design-system/typography';

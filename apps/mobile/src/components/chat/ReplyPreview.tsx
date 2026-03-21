@@ -38,7 +38,7 @@ export function ReplyPreview({
         styles.container,
         {
           backgroundColor: colors.surfaceDefault,
-          borderLeftColor: colors.accentPrimary,
+          borderStartColor: colors.accentPrimary,
         },
       ]}>
       <View style={styles.content}>
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderLeftWidth: 3,
+    borderStartWidth: 3,
     borderRadius: radius.sm,
     paddingVertical: spacing['6'],
     paddingHorizontal: spacing['12'],
@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   close: {
-    marginLeft: spacing['12'],
+    marginStart: spacing['12'],
     padding: spacing['4'],
   },
 });

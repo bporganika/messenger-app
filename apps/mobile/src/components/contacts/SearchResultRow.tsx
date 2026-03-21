@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
   },
   contactInfo: {
     flex: 1,
-    marginLeft: spacing['12'],
+    marginStart: spacing['12'],
   },
   contactName: {
     fontWeight: '600',

@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.sm,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: spacing['12'],
+    marginEnd: spacing['12'],
   },
   info: {
     flex: 1,

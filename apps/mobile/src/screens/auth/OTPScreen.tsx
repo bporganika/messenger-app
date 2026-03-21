@@ -9,20 +9,16 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
   useSharedValue,
-  useAnimatedStyle,
   withSequence,
   withTiming,
-  withRepeat,
   FadeInUp,
-  interpolateColor,
 } from 'react-native-reanimated';
 import Svg, { Path } from 'react-native-svg';
 import { useTheme } from '../../design-system';
-import { spacing, radius } from '../../design-system/tokens';
-import { timing } from '../../design-system/animations';
-import { fontFamily, typography } from '../../design-system/typography';
+import { spacing } from '../../design-system/tokens';
 import { haptics } from '../../design-system/haptics';
 import { Text } from '../../components/ui';
+import { OTPInput } from '../../components/auth/OTPInput';
 import { useAuthStore } from '../../stores/authStore';
 import { api } from '../../services/api';
 import { useTranslation } from 'react-i18next';
@@ -32,92 +28,6 @@ const CODE_LENGTH = 6;
 const SHAKE_OFFSET = 10;
 const SHAKE_DURATION = 50;
 
-// ─── Animated digit box ─────────────────────────────────
-function DigitBox({
-  digit,
-  isFocused,
-  isError,
-}: {
-  digit: string;
-  isFocused: boolean;
-  isError: boolean;
-}) {
-  const { colors } = useTheme();
-
-  // Blinking cursor
-  const cursorOpacity = useSharedValue(1);
-  useEffect(() => {
-    if (isFocused && !digit) {
-      cursorOpacity.value = withRepeat(
-        withSequence(
-          withTiming(1, { duration: 400 }),
-          withTiming(0, { duration: 400 }),
-        ),
-        -1,
-        true,
-      );
-    } else {
-      cursorOpacity.value = withTiming(0, { duration: 100 });
-    }
-  }, [isFocused, digit, cursorOpacity]);
-
-  const cursorStyle = useAnimatedStyle(() => ({
-    opacity: cursorOpacity.value,
-  }));
-
-  // Border color interpolation
-  const borderProgress = useSharedValue(0);
-  useEffect(() => {
-    if (isError) {
-      borderProgress.value = withTiming(2, { duration: 150 });
-    } else if (digit || isFocused) {
-      borderProgress.value = withTiming(1, { duration: 150 });
-    } else {
-      borderProgress.value = withTiming(0, { duration: 150 });
-    }
-  }, [isError, digit, isFocused, borderProgress]);
-
-  const boxStyle = useAnimatedStyle(() => ({
-    borderColor: interpolateColor(
-      borderProgress.value,
-      [0, 1, 2],
-      [colors.borderDefault, colors.accentPrimary, colors.accentError],
-    ),
-  }));
-
-  return (
-    <Animated.View
-      style={[
-        styles.digitBox,
-        { backgroundColor: colors.surfaceDefault },
-        boxStyle,
-      ]}>
-      {digit ? (
-        <Animated.Text
-          style={[
-            styles.digitText,
-            {
-              color: colors.textPrimary,
-              fontFamily: fontFamily.bold,
-              fontSize: typography.heading.fontSize,
-            },
-          ]}>
-          {digit}
-        </Animated.Text>
-      ) : (
-        <Animated.View
-          style={[
-            styles.cursor,
-            { backgroundColor: colors.accentPrimary },
-            cursorStyle,
-          ]}
-        />
-      )}
-    </Animated.View>
-  );
-}
-
-// ─── Screen ─────────────────────────────────────────────
 export function OTPScreen({ navigation, route }: AuthScreenProps<'OTP'>) {
   const { target } = route.params;
   const { colors } = useTheme();
@@ -134,10 +44,6 @@ export function OTPScreen({ navigation, route }: AuthScreenProps<'OTP'>) {
   const inputRef = useRef<TextInput>(null);
   const shakeX = useSharedValue(0);
 
-  const shakeStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: shakeX.value }],
-  }));
-
   // Auto-focus hidden input
   useEffect(() => {
     const timeout = setTimeout(() => inputRef.current?.focus(), 400);
@@ -148,7 +54,7 @@ export function OTPScreen({ navigation, route }: AuthScreenProps<'OTP'>) {
   useEffect(() => {
     if (resendTimer <= 0) return;
     const interval = setInterval(() => {
-      setResendTimer((t) => t - 1);
+      setResendTimer((prev) => prev - 1);
     }, 1000);
     return () => clearInterval(interval);
   }, [resendTimer]);
@@ -204,13 +110,11 @@ export function OTPScreen({ navigation, route }: AuthScreenProps<'OTP'>) {
 
   const handleChangeText = useCallback(
     (text: string) => {
-      // Only digits
       const digits = text.replace(/\D/g, '').slice(0, CODE_LENGTH);
       setError(false);
       setCode(digits);
       setFocusedIndex(Math.min(digits.length, CODE_LENGTH - 1));
 
-      // Auto-submit when all 6 digits entered
       if (digits.length === CODE_LENGTH) {
         handleSubmit(digits);
       }
@@ -234,9 +138,6 @@ export function OTPScreen({ navigation, route }: AuthScreenProps<'OTP'>) {
     const secs = s % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
-
-  // Split code string into individual digits for display
-  const digits = code.split('');
 
   return (
     <View
@@ -277,25 +178,19 @@ export function OTPScreen({ navigation, route }: AuthScreenProps<'OTP'>) {
         </Text>
       </Animated.View>
 
-      {/* OTP digit boxes — visual only, tapping focuses hidden input */}
+      {/* OTP digit boxes */}
       <Animated.View entering={FadeInUp.delay(200).springify()}>
-        <Pressable
-          onPress={() => inputRef.current?.focus()}
-          style={styles.codeRow}>
-          <Animated.View style={[styles.codeRow, shakeStyle]}>
-            {Array.from({ length: CODE_LENGTH }).map((_, i) => (
-              <DigitBox
-                key={i}
-                digit={digits[i] ?? ''}
-                isFocused={!error && focusedIndex === i && code.length < CODE_LENGTH}
-                isError={error}
-              />
-            ))}
-          </Animated.View>
-        </Pressable>
+        <OTPInput
+          code={code}
+          codeLength={CODE_LENGTH}
+          focusedIndex={focusedIndex}
+          isError={error}
+          shakeX={shakeX}
+          inputRef={inputRef}
+        />
       </Animated.View>
 
-      {/* Hidden TextInput — captures all keyboard input + SMS auto-fill */}
+      {/* Hidden TextInput */}
       <TextInput
         ref={inputRef}
         value={code}
@@ -326,12 +221,10 @@ export function OTPScreen({ navigation, route }: AuthScreenProps<'OTP'>) {
           </Pressable>
         )}
       </Animated.View>
-
     </View>
   );
 }
 
-// ─── Styles ─────────────────────────────────────────────
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -349,28 +242,6 @@ const styles = StyleSheet.create({
   },
   sub: {
     marginBottom: spacing['32'],
-  },
-  codeRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: spacing['8'],
-  },
-  digitBox: {
-    width: 48,
-    height: 56,
-    borderWidth: 1.5,
-    borderRadius: radius.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  digitText: {
-    textAlign: 'center',
-    includeFontPadding: false,
-  },
-  cursor: {
-    width: 2,
-    height: 24,
-    borderRadius: 1,
   },
   hiddenInput: {
     position: 'absolute',

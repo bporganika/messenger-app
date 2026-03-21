@@ -111,7 +111,7 @@ export function VoicePlayer({
 
   return (
     <Pressable onLongPress={handleLongPress} style={styles.container}>
-      <Pressable onPress={handlePlayPause} style={styles.playBtn}>
+      <Pressable onPress={handlePlayPause} hitSlop={4} style={styles.playBtn}>
         {playing ? (
           <PauseIcon color={colors.accentPrimary} />
         ) : (
@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: spacing['8'],
+    marginEnd: spacing['8'],
   },
   waveformArea: {
     flex: 1,

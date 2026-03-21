@@ -21,7 +21,7 @@ export interface ContactRowProps {
 // ─── Component ──────────────────────────────────────────
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
-export function ContactRow({ contact, onPress }: ContactRowProps) {
+export const ContactRow = React.memo(function ContactRow({ contact, onPress }: ContactRowProps) {
   const { colors } = useTheme();
   const scale = useSharedValue(1);
 
@@ -62,7 +62,7 @@ export function ContactRow({ contact, onPress }: ContactRowProps) {
       </View>
     </AnimatedPressable>
   );
-}
+});
 
 // ─── Styles ─────────────────────────────────────────────
 const styles = StyleSheet.create({
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
   },
   contactInfo: {
     flex: 1,
-    marginLeft: spacing['12'],
+    marginStart: spacing['12'],
   },
   contactName: {
     fontWeight: '600',

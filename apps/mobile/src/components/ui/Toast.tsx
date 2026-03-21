@@ -80,7 +80,7 @@ export function Toast({
           top: insets.top + spacing['8'],
           backgroundColor: colors.surfaceElevated,
           borderColor: colors.borderDefault,
-          borderLeftColor: accentColor,
+          borderStartColor: accentColor,
         },
         animatedStyle,
       ]}
@@ -97,11 +97,11 @@ export function Toast({
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    left: spacing['16'],
-    right: spacing['16'],
+    start: spacing['16'],
+    end: spacing['16'],
     borderRadius: radius.md,
     borderWidth: 1,
-    borderLeftWidth: 3,
+    borderStartWidth: 3,
     zIndex: 9999,
   },
   pressable: {

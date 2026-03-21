@@ -15,7 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '../../design-system';
 import { spacing } from '../../design-system/tokens';
 import { haptics } from '../../design-system/haptics';
-import { Text, EmptyState } from '../../components/ui';
+import { Text, EmptyState, Skeleton } from '../../components/ui';
 import {
   ContactSearchBar,
   ContactsListHeader,
@@ -44,6 +44,8 @@ export function ContactsScreen({
   const [syncing, setSyncing] = useState(false);
   const [synced, setSynced] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -120,11 +122,14 @@ export function ContactsScreen({
 
   // ── Load contacts ──
   const loadContacts = useCallback(async () => {
+    setError(false);
     try {
       const data = await api.get<{ contacts: PulseContact[] }>('/contacts');
       setContacts(data.contacts);
     } catch {
-      // silently fail on load
+      setError(true);
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -193,8 +198,32 @@ export function ContactsScreen({
         onClear={handleClearSearch}
       />
 
+      {/* Loading skeleton */}
+      {loading && (
+        <View style={styles.skeletonWrap}>
+          {Array.from({ length: 6 }).map((_, i) => (
+            <View key={i} style={styles.skeletonRow}>
+              <Skeleton width={44} height={44} variant="circle" />
+              <View style={styles.skeletonTextCol}>
+                <Skeleton width="55%" height={14} variant="text" />
+                <Skeleton width="35%" height={12} variant="text" style={{ marginTop: 6 }} />
+              </View>
+            </View>
+          ))}
+        </View>
+      )}
+
+      {/* Error state */}
+      {error && !loading && (
+        <EmptyState
+          title={t('common.error')}
+          actionTitle={t('common.retry')}
+          onAction={loadContacts}
+        />
+      )}
+
       {/* ── Search results mode ── */}
-      {isSearching ? (
+      {!loading && !error && isSearching ? (
         <FlatList
           data={searchResults}
           keyExtractor={(item) => item.id}
@@ -299,5 +328,20 @@ const styles = StyleSheet.create({
     borderRadius: 32,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  skeletonWrap: {
+    flex: 1,
+    paddingHorizontal: spacing['16'],
+    paddingTop: spacing['12'],
+  },
+  skeletonRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: spacing['12'],
+    gap: spacing['12'],
+  },
+  skeletonTextCol: {
+    flex: 1,
+    gap: spacing['4'],
   },
 });

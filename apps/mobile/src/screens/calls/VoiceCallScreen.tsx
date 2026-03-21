@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
   },
   backBtn: {
     position: 'absolute',
-    left: spacing['16'],
+    start: spacing['16'],
     width: 40,
     height: 40,
     alignItems: 'center',

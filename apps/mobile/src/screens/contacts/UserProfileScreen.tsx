@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   back: {
-    marginLeft: spacing['16'],
+    marginStart: spacing['16'],
     marginBottom: spacing['16'],
     width: 40,
     height: 40,

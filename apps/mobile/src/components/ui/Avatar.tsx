@@ -141,11 +141,13 @@ export function Avatar({
   );
 
   if (onPress) {
+    const hitSlop = dimension < 44 ? (44 - dimension) / 2 : 0;
     return (
       <AnimatedPressable
         onPress={handlePress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
+        hitSlop={hitSlop}
         style={animatedStyle}>
         {content}
       </AnimatedPressable>
@@ -171,6 +173,6 @@ const styles = StyleSheet.create({
   statusDot: {
     position: 'absolute',
     bottom: 0,
-    right: 0,
+    end: 0,
   },
 });

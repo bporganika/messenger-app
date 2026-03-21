@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import type { ReactNode, ErrorInfo } from 'react';
 import { View, StyleSheet, Pressable } from 'react-native';
+import i18next from 'i18next';
 import { Text } from './Text';
 import { spacing } from '../../design-system/tokens';
 
@@ -37,11 +38,11 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       return (
         <View style={styles.container}>
           <Text variant="title" color="#A1A1AA" align="center">
-            Something went wrong
+            {i18next.t('common.error')}
           </Text>
           <Pressable onPress={this.handleRetry} style={styles.retryButton}>
             <Text variant="body" color="#7C3AED">
-              Tap to retry
+              {i18next.t('common.retry')}
             </Text>
           </Pressable>
         </View>

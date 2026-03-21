@@ -14,7 +14,7 @@ import { spacing } from '../../design-system/tokens';
 import { haptics } from '../../design-system/haptics';
 import { useTranslation } from 'react-i18next';
 import { api } from '../../services/api';
-import { Text, EmptyState } from '../../components/ui';
+import { Text, EmptyState, Skeleton } from '../../components/ui';
 import { ChatListItem } from '../../components/chat/ChatListItem';
 import type { ChatScreenProps } from '../../navigation/types';
 import type { Conversation, DeleteTarget } from './types';
@@ -42,6 +42,8 @@ export function ChatListScreen({ navigation }: ChatScreenProps<'ChatList'>) {
 
   const [search, setSearch] = useState('');
   const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [deleteTarget, setDeleteTarget] = useState<DeleteTarget | null>(null);
   const [contextTarget, setContextTarget] = useState<Conversation | null>(null);
@@ -57,24 +59,28 @@ export function ChatListScreen({ navigation }: ChatScreenProps<'ChatList'>) {
     );
   }, [conversations, search]);
 
-  const handleRefresh = useCallback(async () => {
-    setRefreshing(true);
-    haptics.pullToRefresh();
+  const loadConversations = useCallback(async (isRefresh = false) => {
+    if (isRefresh) {
+      setRefreshing(true);
+      haptics.pullToRefresh();
+    }
+    setError(false);
     try {
       const data = await api.get<{ conversations: Conversation[] }>(
         '/conversations',
       );
       setConversations(data.conversations);
-    } catch (e) {
-      console.warn('[ChatList] refresh failed:', e);
+    } catch {
+      setError(true);
     } finally {
+      setLoading(false);
       setRefreshing(false);
     }
   }, []);
 
   useEffect(() => {
-    handleRefresh();
-  }, [handleRefresh]);
+    loadConversations();
+  }, [loadConversations]);
 
   const handleArchive = useCallback((id: string) => {
     setConversations((prev) =>
@@ -99,6 +105,11 @@ export function ChatListScreen({ navigation }: ChatScreenProps<'ChatList'>) {
     setContextTarget(item);
   }, []);
 
+  const itemBgStyle = useMemo(
+    () => ({ backgroundColor: colors.bgPrimary }),
+    [colors.bgPrimary],
+  );
+
   const renderItem = useCallback(
     ({ item }: { item: Conversation }) => (
       <SwipeableRow
@@ -115,7 +126,7 @@ export function ChatListScreen({ navigation }: ChatScreenProps<'ChatList'>) {
           lastMessageIsSent={item.lastMessageIsSent}
           timestamp={item.timestamp}
           unreadCount={item.unreadCount}
-          style={{ backgroundColor: colors.bgPrimary }}
+          style={itemBgStyle}
           onPress={() =>
             navigation.navigate('Chat', {
               conversationId: item.id,
@@ -127,7 +138,7 @@ export function ChatListScreen({ navigation }: ChatScreenProps<'ChatList'>) {
         />
       </SwipeableRow>
     ),
-    [navigation, handleArchive, handleDelete, handleLongPress, colors.bgPrimary],
+    [navigation, handleArchive, handleDelete, handleLongPress, itemBgStyle],
   );
 
   const keyExtractor = useCallback((item: Conversation) => item.id, []);
@@ -176,8 +187,32 @@ export function ChatListScreen({ navigation }: ChatScreenProps<'ChatList'>) {
       {/* Search */}
       <ChatSearchBar value={search} onChangeText={setSearch} />
 
+      {/* Loading skeleton */}
+      {loading && (
+        <View style={styles.skeletonWrap}>
+          {Array.from({ length: 8 }).map((_, i) => (
+            <View key={i} style={styles.skeletonRow}>
+              <Skeleton width={60} height={60} variant="circle" />
+              <View style={styles.skeletonText}>
+                <Skeleton width="60%" height={14} variant="text" />
+                <Skeleton width="80%" height={12} variant="text" style={{ marginTop: 8 }} />
+              </View>
+            </View>
+          ))}
+        </View>
+      )}
+
+      {/* Error */}
+      {error && !loading && (
+        <EmptyState
+          title={t('common.error')}
+          actionTitle={t('common.retry')}
+          onAction={() => loadConversations()}
+        />
+      )}
+
       {/* List */}
-      <FlatList
+      {!loading && !error && <FlatList
         data={filtered}
         keyExtractor={keyExtractor}
         renderItem={renderItem}
@@ -188,7 +223,7 @@ export function ChatListScreen({ navigation }: ChatScreenProps<'ChatList'>) {
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
-            onRefresh={handleRefresh}
+            onRefresh={() => loadConversations(true)}
             tintColor={colors.accentPrimary}
             colors={[colors.accentPrimary]}
           />
@@ -243,7 +278,7 @@ export function ChatListScreen({ navigation }: ChatScreenProps<'ChatList'>) {
           )
         }
         showsVerticalScrollIndicator={false}
-      />
+      />}
 
       {/* Modals */}
       <DeleteConversationModal
@@ -287,7 +322,7 @@ const styles = StyleSheet.create({
   },
   separator: {
     height: StyleSheet.hairlineWidth,
-    marginLeft: spacing['16'] + 60 + spacing['12'],
+    marginStart: spacing['16'] + 60 + spacing['12'],
   },
   emptyIcon: {
     width: 64,
@@ -304,5 +339,19 @@ const styles = StyleSheet.create({
   },
   noResultsSub: {
     marginTop: spacing['4'],
+  },
+  skeletonWrap: {
+    flex: 1,
+    paddingHorizontal: spacing['16'],
+  },
+  skeletonRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: spacing['12'],
+    gap: spacing['12'],
+  },
+  skeletonText: {
+    flex: 1,
+    gap: spacing['4'],
   },
 });

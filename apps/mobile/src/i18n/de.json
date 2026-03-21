@@ -183,6 +183,8 @@
     "end": "Beenden"
   },
   "calls": {
+    "callCount_one": "{{count}} Anruf",
+    "callCount_other": "{{count}} Anrufe",
     "incoming": "Eingehend",
     "outgoing": "Ausgehend",
     "missed": "Verpasst",
@@ -204,6 +206,10 @@
     "videoType": "Video",
     "voiceMessage": "Sprachnachricht",
     "document": "Dokument",
+    "unreadCount_one": "{{count}} ungelesene Nachricht",
+    "unreadCount_other": "{{count}} ungelesene Nachrichten",
+    "newMessage_one": "{{count}} neue Nachricht",
+    "newMessage_other": "{{count}} neue Nachrichten",
     "search": "Suchen...",
     "archive": "Archivieren",
     "deleteConversation": "Unterhaltung löschen",
@@ -224,6 +230,8 @@
     "today": "Heute"
   },
   "contacts": {
+    "contactCount_one": "{{count}} Kontakt",
+    "contactCount_other": "{{count}} Kontakte",
     "inviteFriends": "Freunde einladen",
     "inviteSubtitle": "Teilen Sie Ihren persönlichen Link, um Freunde zu Pulse einzuladen",
     "shareLink": "Einladungslink teilen",

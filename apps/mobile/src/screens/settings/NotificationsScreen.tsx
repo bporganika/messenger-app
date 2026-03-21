@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
   rowIcon: {
     width: 28,
     alignItems: 'center',
-    marginRight: spacing['12'],
+    marginEnd: spacing['12'],
   },
   rowText: { flex: 1, gap: spacing['2'] },
 });

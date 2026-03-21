@@ -123,8 +123,8 @@ const styles = StyleSheet.create({
   topBar: {
     position: 'absolute',
     top: 0,
-    left: 0,
-    right: 0,
+    start: 0,
+    end: 0,
     zIndex: 10,
     flexDirection: 'row',
     alignItems: 'center',
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
   },
   localPip: {
     position: 'absolute',
-    right: spacing['16'],
+    end: spacing['16'],
     width: 100,
     height: 140,
     borderRadius: 16,

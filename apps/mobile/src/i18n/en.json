@@ -184,6 +184,8 @@
   },
   "calls": {
     "title": "Calls",
+    "callCount_one": "{{count}} call",
+    "callCount_other": "{{count}} calls",
     "incoming": "Incoming",
     "outgoing": "Outgoing",
     "missed": "Missed",
@@ -204,6 +206,10 @@
     "videoType": "Video",
     "voiceMessage": "Voice message",
     "document": "Document",
+    "unreadCount_one": "{{count}} unread message",
+    "unreadCount_other": "{{count}} unread messages",
+    "newMessage_one": "{{count}} new message",
+    "newMessage_other": "{{count}} new messages",
     "search": "Search...",
     "archive": "Archive",
     "deleteConversation": "Delete conversation",
@@ -224,6 +230,8 @@
     "today": "Today"
   },
   "contacts": {
+    "contactCount_one": "{{count}} contact",
+    "contactCount_other": "{{count}} contacts",
     "inviteFriends": "Invite friends",
     "inviteSubtitle": "Share your personal link to invite friends to Pulse",
     "shareLink": "Share invite link",

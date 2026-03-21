@@ -99,7 +99,7 @@ export function SwipeToReply({
 const styles = StyleSheet.create({
   replyIconWrap: {
     position: 'absolute',
-    left: spacing['4'],
+    start: spacing['4'],
     top: 0,
     bottom: 0,
     justifyContent: 'center',

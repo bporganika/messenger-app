@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
   usernameHint: {
     marginTop: -spacing['12'],
     marginBottom: spacing['16'],
-    marginLeft: spacing['4'],
+    marginStart: spacing['4'],
   },
   dotsRow: {
     flexDirection: 'row',

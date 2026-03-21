@@ -183,6 +183,8 @@
     "end": "Bitir"
   },
   "calls": {
+    "callCount_one": "{{count}} arama",
+    "callCount_other": "{{count}} arama",
     "incoming": "Gelen",
     "outgoing": "Giden",
     "missed": "Cevapsız",
@@ -204,6 +206,10 @@
     "videoType": "Video",
     "voiceMessage": "Sesli mesaj",
     "document": "Belge",
+    "unreadCount_one": "{{count}} okunmamış mesaj",
+    "unreadCount_other": "{{count}} okunmamış mesaj",
+    "newMessage_one": "{{count}} yeni mesaj",
+    "newMessage_other": "{{count}} yeni mesaj",
     "search": "Ara...",
     "archive": "Arşivle",
     "deleteConversation": "Konuşmayı sil",
@@ -224,6 +230,8 @@
     "today": "Bugün"
   },
   "contacts": {
+    "contactCount_one": "{{count}} kişi",
+    "contactCount_other": "{{count}} kişi",
     "inviteFriends": "Arkadaşlarını davet et",
     "inviteSubtitle": "Arkadaşlarınızı Pulse'a davet etmek için kişisel bağlantınızı paylaşın",
     "shareLink": "Davet bağlantısını paylaş",

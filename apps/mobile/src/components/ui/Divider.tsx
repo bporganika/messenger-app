@@ -17,7 +17,7 @@ export function Divider({ inset = 0, style }: DividerProps) {
         styles.base,
         {
           backgroundColor: colors.separator,
-          marginLeft: inset,
+          marginStart: inset,
           marginVertical: spacing['2'],
         },
         style,

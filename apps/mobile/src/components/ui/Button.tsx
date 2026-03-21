@@ -111,6 +111,7 @@ export function Button({
   }, [disabled, loading, onPress]);
 
   const height = buttonHeight[size];
+  const hitSlop = height < 44 ? (44 - height) / 2 : 0;
 
   const containerStyle = getContainerStyle(variant, colors, shadows);
   const labelStyle = getLabelStyle(variant, colors);
@@ -121,6 +122,7 @@ export function Button({
       onPressIn={handlePressIn}
       onPressOut={handlePressOut}
       disabled={disabled || loading}
+      hitSlop={hitSlop}
       style={[
         styles.base,
         { height },
@@ -139,8 +141,8 @@ export function Button({
             color={labelStyle.color as string}
             style={[
               styles.label,
-              leftIcon ? { marginLeft: spacing['8'] } : undefined,
-              rightIcon ? { marginRight: spacing['8'] } : undefined,
+              leftIcon ? { marginStart: spacing['8'] } : undefined,
+              rightIcon ? { marginEnd: spacing['8'] } : undefined,
             ]}>
             {title}
           </Text>

@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
   },
   closeBtn: {
     position: 'absolute',
-    left: spacing['16'],
+    start: spacing['16'],
     zIndex: 10,
     width: 40,
     height: 40,

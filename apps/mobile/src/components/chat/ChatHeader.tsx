@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing['8'],
-    marginLeft: spacing['4'],
+    marginStart: spacing['4'],
   },
   headerText: {
     flex: 1,

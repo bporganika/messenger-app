@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
   },
   cancelHint: {
     position: 'absolute',
-    left: spacing['16'],
+    start: spacing['16'],
   },
   container: {
     flex: 1,
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     height: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: spacing['8'],
+    marginEnd: spacing['8'],
   },
   pulseRing: {
     position: 'absolute',

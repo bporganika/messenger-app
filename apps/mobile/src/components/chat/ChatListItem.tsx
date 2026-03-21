@@ -48,7 +48,7 @@ function getMessagePreview(
   return text ?? '';
 }
 
-export function ChatListItem({
+export const ChatListItem = React.memo(function ChatListItem({
   name,
   avatarUri,
   onlineStatus,
@@ -138,7 +138,7 @@ export function ChatListItem({
       </View>
     </AnimatedPressable>
   );
-}
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    marginLeft: spacing['12'],
+    marginStart: spacing['12'],
   },
   topRow: {
     flexDirection: 'row',
@@ -159,7 +159,7 @@ const styles = StyleSheet.create({
   },
   name: {
     flex: 1,
-    marginRight: spacing['8'],
+    marginEnd: spacing['8'],
   },
   bottomRow: {
     flexDirection: 'row',
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
-    marginRight: spacing['8'],
+    marginEnd: spacing['8'],
   },
   preview: {
     flex: 1,

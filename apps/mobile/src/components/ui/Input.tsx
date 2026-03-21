@@ -139,10 +139,10 @@ const styles = StyleSheet.create({
     includeFontPadding: false,
   },
   iconLeft: {
-    marginRight: spacing['12'],
+    marginEnd: spacing['12'],
   },
   iconRight: {
-    marginLeft: spacing['12'],
+    marginStart: spacing['12'],
   },
   error: {
     marginTop: spacing['4'],

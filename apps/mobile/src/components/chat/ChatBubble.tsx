@@ -51,7 +51,7 @@ export interface ChatBubbleProps {
   onPlayPause?: () => void;
 }
 
-export function ChatBubble({
+export const ChatBubble = React.memo(function ChatBubble({
   type,
   isSent,
   text,
@@ -184,7 +184,7 @@ export function ChatBubble({
           <View
             style={[
               styles.reply,
-              { borderLeftColor: colors.accentPrimary, backgroundColor: colors.surfaceDefault },
+              { borderStartColor: colors.accentPrimary, backgroundColor: colors.surfaceDefault },
             ]}>
             <Text
               variant="caption"
@@ -216,7 +216,7 @@ export function ChatBubble({
       </AnimatedPressable>
     </Animated.View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   wrapper: {
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
     maxWidth: '80%',
   },
   reply: {
-    borderLeftWidth: 2,
+    borderStartWidth: 2,
     borderRadius: radius.xs,
     paddingHorizontal: spacing['8'],
     paddingVertical: spacing['4'],
